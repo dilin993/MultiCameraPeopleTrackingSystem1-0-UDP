@@ -18,6 +18,7 @@
 #include <csignal>
 #include "BGSDetector.h"
 #include "NodeClient.h"
+#include "ClientUDP.h"
 
 using namespace std;
 using namespace cv;
@@ -68,9 +69,7 @@ int main(int argc, const char * argv[])
         }
     }
 
-    NodeClient client(serverIP,serverPort);
-    client.connect();
-    cout << "Connected to " << client.getIP() << ":" << client.getPort() << " !" << endl;
+    ClientUDP client(serverIP,serverPort);
 
     /******************Initializing V4L2 Driver Starts Here**********************/
     // 1.  Open the device

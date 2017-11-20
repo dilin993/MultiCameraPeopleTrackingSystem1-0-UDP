@@ -9,6 +9,7 @@
 #include "DataAssociation.h"
 #include "graph.h"
 #include "CameraConfig.h"
+#include "ServerUDP.h"
 
 #define DISPLAY_FLAG 1
 
@@ -19,7 +20,7 @@ unsigned short port = 8080;
 void server_thread_func(FrameQueue & frames)
 {
     boost::asio::io_service io_service;
-    Server server(io_service,port,frames);
+    ServerUDP server(io_service,port,frames);
     io_service.run();
 }
 

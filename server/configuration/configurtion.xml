@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<configuration>
+
+    <main port="8080" num_nodes="2" width="320" height="240" dist_th="100"/>
+
+    <camera0 config="/home/dilin/fyp/MultiCameraPeopleTrackingSystem1-0/server/configuration/camera-c0-config.xml"/>
+    <camera1 config="/home/dilin/fyp/MultiCameraPeopleTrackingSystem1-0/server/configuration/camera-c0-config.xml"/>
+
+</configuration>

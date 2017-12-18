@@ -44,6 +44,15 @@ void ServerUDP::handle_receive(const boost::system::error_code &error,
         Frame t;
         archive >> t;
 
+        boost::chrono::high_resolution_clock::time_point stop =
+                boost::chrono::high_resolution_clock::now();
+        boost::chrono::high_resolution_clock::time_point start = t.timeStamp;
+        std::cout
+                << "packet delay = "
+                << boost::chrono::duration_cast<boost::chrono::milliseconds>(stop - start).count()
+                << " ms"
+                << std::endl;
+
         frames.enqueue(t);
 
         start_receive();

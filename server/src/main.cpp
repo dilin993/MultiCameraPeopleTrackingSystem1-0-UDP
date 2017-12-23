@@ -113,9 +113,16 @@ int main(int argc, const char * argv[])
                 histograms.clear();
 
                 k=0;
+
+                imgs[n] = Mat::zeros(HEIGHT,WIDTH,CV_8UC3);
+
                 for (auto const bbox : frame.detections)
                 {
                     Rect detection(bbox.x, bbox.y, bbox.width, bbox.height);
+
+                    drawMarker(imgs[n], Point(bbox.x+bbox.width/2,bbox.y+bbox.height),
+                               Scalar(255,255,255),
+                               MarkerTypes::MARKER_CROSS, 30, 10);
 
                     // track bottom middle point
                     detections.push_back(Point(bbox.x+bbox.width/2,bbox.y+bbox.height));
@@ -136,20 +143,21 @@ int main(int argc, const char * argv[])
 
 #ifdef DISPLAY_FLAG
                 // draw detections
-                imgs[n] = Mat::zeros(HEIGHT,WIDTH,CV_8UC3);
-
-                groundPlanePoints.clear();
-
-                for(int i=0;i<tracks.size();i++)
-                {
-                    Point2f pos = tracks[i].getPos();
-                    pos = cameraConfigs[n].convertToGround(pos);
-                    drawMarker(imgs[n], pos,
-                               tracks[i].color,
-                               MarkerTypes::MARKER_CROSS, 30, 10);
-                    groundPlanePoints.push_back(TrackedPoint(tracks[i].histogram,
-                                                             pos));
-                }
+//                imgs[n] = Mat::zeros(HEIGHT,WIDTH,CV_8UC3);
+//
+//                groundPlanePoints.clear();
+//
+//                for(int i=0;i<tracks.size();i++)
+//                {
+//                    Point2f pos = tracks[i].getPos();
+//                    drawMarker(imgs[n], pos,
+//                               tracks[i].color,
+//                               MarkerTypes::MARKER_CROSS, 30, 10);
+//                    pos = cameraConfigs[n].convertToGround(pos);
+//                    groundPlanePoints.push_back(TrackedPoint(tracks[i].histogram,
+//                                                             pos));
+//
+//                }
 
 
 

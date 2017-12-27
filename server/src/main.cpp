@@ -120,9 +120,7 @@ int main(int argc, const char * argv[])
                 {
                     Rect detection(bbox.x, bbox.y, bbox.width, bbox.height);
 
-                    drawMarker(imgs[n], Point(bbox.x+bbox.width/2,bbox.y+bbox.height),
-                               Scalar(255,255,255),
-                               MarkerTypes::MARKER_CROSS, 30, 10);
+                    rectangle(imgs[n], detection.tl(), detection.br(), cv::Scalar(0, 255, 0), 2);
 
                     // track bottom middle point
                     detections.push_back(Point(bbox.x+bbox.width/2,bbox.y+bbox.height));

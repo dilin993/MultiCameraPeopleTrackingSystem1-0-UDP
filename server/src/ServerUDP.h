@@ -18,7 +18,7 @@
 #include "Frame.h"
 #include "FrameQueue.h"
 
-#define BUFFER_SIZE 5120
+#define BUFFER_SIZE 32768
 
 using namespace std;
 using namespace cv;

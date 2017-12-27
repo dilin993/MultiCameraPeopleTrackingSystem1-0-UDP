@@ -28,6 +28,10 @@ using namespace cv;
 int fd; // A file descriptor to the video device
 int type;
 
+BGSDetector *detector;
+ClientUDP *client;
+bool trainingMode = false;
+
 void signalHandler( int signum ) {
     cout << "Interrupt signal (" << signum << ") received.\n";
 
@@ -40,6 +44,14 @@ void signalHandler( int signum ) {
     }
 
     close(fd);
+
+    if(trainingMode)
+        detector->trainDetector();
+
+    delete detector;
+
+    delete client;
+
     exit(signum);
 }
 
@@ -66,10 +78,20 @@ int main(int argc, const char * argv[])
             videoSource = config.child("video").attribute("source").as_string();
             cameraID = (uint8_t)config.child("camera").attribute("id").as_int();
             serverPort = (unsigned short)config.child("server").attribute("port").as_int();
+            trainingMode = config.child("video").attribute("training").as_bool();
+            detector = new BGSDetector(30,
+                                       BGS_MOVING_AVERAGE,
+                                       false,
+                                       "/home/dilin/fyp/MultiCameraPeopleTrackingSystem1-0-UDP/client/pca.xml",
+                                       trainingMode);
         }
     }
 
-    ClientUDP client(serverIP,serverPort);
+    boost::asio::io_service io_service;
+    if(!trainingMode)
+    {
+        client = new ClientUDP(io_service,serverIP,serverPort);
+    }
 
     /******************Initializing V4L2 Driver Starts Here**********************/
     // 1.  Open the device
@@ -152,7 +174,7 @@ int main(int argc, const char * argv[])
     Mat img(imageFormat.fmt.pix.height,
             imageFormat.fmt.pix.width,
             CV_8UC3);
-    BGSDetector detector;
+
 
 
 #ifdef DISPLAY_MAIN
@@ -188,35 +210,54 @@ int main(int argc, const char * argv[])
 
         cvtColor(img,img,CV_YUV2BGR);
 
-        vector<Rect> detections = detector.detect(img);
+        vector<Rect> detections = detector->detect(img);
 
-        Frame frame;
-        frame.frameNo = frameNo;
-        frame.cameraID = cameraID;
-        for(int q=0;q<detections.size();q++)
+        if(!trainingMode)
         {
-            BoundingBox bbox;
-            bbox.x = detections[q].x;
-            bbox.y = detections[q].y;
-            bbox.width = detections[q].width;
-            bbox.height = detections[q].height;
-            frame.detections.push_back(bbox);
-
-            vector<uint16_t> histogram(512);
-            for(int r=0;r<512;r++)
+            Frame frame;
+            frame.frameNo = frameNo;
+            frame.cameraID = cameraID;
+            for(int q=0;q<detections.size();q++)
             {
-                histogram[r] = (uint16_t)detector.histograms[q].at<short>(r);
-            }
-            frame.histograms.push_back(histogram);
-        }
-        frameNo++;
+                BoundingBox bbox;
+                bbox.x = detections[q].x;
+                bbox.y = detections[q].y;
+                bbox.width = detections[q].width;
+                bbox.height = detections[q].height;
+                frame.detections.push_back(bbox);
 
-        client.send(frame);
+                vector<uint16_t> histogram(512);
+                for(int r=0;r<512;r++)
+                {
+                    histogram[r] = (uint16_t)detector->histograms[q].at<short>(r);
+                }
+                frame.histograms.push_back(histogram);
+            }
+            frameNo++;
+
+            client->send(frame);
+        }
+
 
 #ifdef DISPLAY_MAIN
+        for(int i=0;i<detections.size();i++)
+        {
+            rectangle(img, detections[i].tl(), detections[i].br()
+                    , cv::Scalar(0,255,0), 2);
+        }
         imshow(DISPLAY_MAIN,img);
         if(waitKey(1)>0)
+        {
+            if(trainingMode)
+            {
+                cout << "Training the detector..." << endl;
+                detector->trainDetector();
+                cout << "Training finished!" << endl;
+            }
+
             break;
+        }
+
 #endif
 
 

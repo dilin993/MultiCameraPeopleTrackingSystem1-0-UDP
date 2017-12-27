@@ -4,6 +4,8 @@
 
 #ifndef TRACK_BGSDETECTOR_H
 #define TRACK_BGSDETECTOR_H
+
+#include <fstream>
 #include <opencv2/opencv.hpp>
 #include <opencv2/bgsegm.hpp>
 #include "Detector.h"
@@ -40,13 +42,22 @@ enum
     BGS_GMM=2
 };
 
+struct DetectionRecord
+{
+    float data[8];
+};
+
 class BGSDetector : public Detector
 {
 public:
-    explicit BGSDetector(double TH=15,
-                         int method=BGS_GMM,
-                         bool doGammaCorrection=false);
+    explicit BGSDetector(double TH=30,
+                         int method=BGS_MOVING_AVERAGE,
+                         bool doGammaCorrection=false,
+                         string coeffFilePath="",
+                         bool trainingMode=false);
     std::vector<cv::Rect> detect(cv::Mat &img);
+    vector<DetectionRecord> data;
+    void trainDetector();
 
 private:
     void backgroundSubstraction(cv::Mat &frame0, cv::Mat &frame1, cv::Mat &frame2
@@ -60,6 +71,13 @@ private:
     void GammaCorrection(cv::Mat& src, cv::Mat& dst, float fGamma);
     int method;
     bool doGamaCorrection;
+    string coeffFilePath;
+    FileStorage coeffFile;
+    bool trainingMode;
+    double coeff[64];
+    PCA pca;
+    float detectorTH=0;
+
 };
 
 

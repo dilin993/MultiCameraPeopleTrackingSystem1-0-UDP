@@ -11,7 +11,7 @@
 #include "Detector.h"
 #include "Histogram.h"
 
-#define BGS_DEBUG_MODE
+//#define BGS_DEBUG_MODE
 
 class Blob
 {

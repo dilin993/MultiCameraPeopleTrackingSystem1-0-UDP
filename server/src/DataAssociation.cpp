@@ -5,11 +5,12 @@
 #include "DataAssociation.h"
 
 DataAssociation::DataAssociation(double TRACK_INIT_TH,int REJ_TOL,
-                                int WIDTH,int HEIGHT):
+                                 int WIDTH,int HEIGHT):
         TRACK_INIT_TH(TRACK_INIT_TH),
         REJ_TOL(REJ_TOL),
         WIDTH(WIDTH),
-        HEIGHT(HEIGHT)
+        HEIGHT(HEIGHT),
+        dataFile("../data.csv")
 {
 
 }
@@ -52,6 +53,7 @@ void DataAssociation::assignTracks(vector<Point2f> detections,
                 row.push_back(e);
             }
             cout << "min_e = " << min_e << endl;
+            dataFile << min_e << endl;
             if (min_e > TRACK_INIT_TH) // initialize new track
             {
                 ParticleFilterTracker tr(detections[i],histograms[i],
@@ -158,6 +160,6 @@ void DataAssociation::setSize(int width, int height)
 }
 
 DataAssociation::DataAssociation() :
-DataAssociation(0,0,0,0)
+        DataAssociation(0,0,0,0)
 {
 }

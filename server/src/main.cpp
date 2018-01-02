@@ -142,20 +142,20 @@ int main(int argc, const char * argv[])
 #ifdef DISPLAY_FLAG
                 // draw detections
 //                imgs[n] = Mat::zeros(HEIGHT,WIDTH,CV_8UC3);
-//
-//                groundPlanePoints.clear();
-//
-//                for(int i=0;i<tracks.size();i++)
-//                {
-//                    Point2f pos = tracks[i].getPos();
-//                    drawMarker(imgs[n], pos,
-//                               tracks[i].color,
-//                               MarkerTypes::MARKER_CROSS, 30, 10);
-//                    pos = cameraConfigs[n].convertToGround(pos);
-//                    groundPlanePoints.push_back(TrackedPoint(tracks[i].histogram,
-//                                                             pos));
-//
-//                }
+
+                groundPlanePoints.clear();
+
+                for(int i=0;i<tracks.size();i++)
+                {
+                    Point2f pos = tracks[i].getPos();
+                    drawMarker(imgs[n], pos,
+                               tracks[i].color,
+                               MarkerTypes::MARKER_CROSS, 20, 5);
+                    pos = cameraConfigs[n].convertToGround(pos);
+                    groundPlanePoints.push_back(TrackedPoint(tracks[i].histogram,
+                                                             pos));
+
+                }
 
 
 

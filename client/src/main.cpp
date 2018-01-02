@@ -32,7 +32,8 @@ BGSDetector *detector;
 ClientUDP *client;
 bool trainingMode = false;
 
-void signalHandler( int signum ) {
+void signalHandler( int signum )
+{
     cout << "Interrupt signal (" << signum << ") received.\n";
 
     // cleanup and close up stuff here

@@ -83,11 +83,11 @@ std::vector<cv::Rect> BGSDetector::detect(cv::Mat &img)
         Blob possibleBlob(convexHull);
 
         float record[8] = {
-                possibleBlob.currentBoundingRect.x,
-                possibleBlob.currentBoundingRect.y,
-                possibleBlob.currentBoundingRect.width,
-                possibleBlob.currentBoundingRect.height,
-                possibleBlob.currentBoundingRect.area(),
+                (float)possibleBlob.currentBoundingRect.x,
+                (float)possibleBlob.currentBoundingRect.y,
+                (float)possibleBlob.currentBoundingRect.width,
+                (float)possibleBlob.currentBoundingRect.height,
+                (float)possibleBlob.currentBoundingRect.area(),
                 (float)possibleBlob.dblCurrentAspectRatio,
                 (float)cv::contourArea(possibleBlob.currentContour),
                 (float)possibleBlob.dblCurrentDiagonalSize
@@ -107,13 +107,6 @@ std::vector<cv::Rect> BGSDetector::detect(cv::Mat &img)
             if(d.at<float>(0)>detectorTH)
                 found.push_back(possibleBlob.currentBoundingRect);
         }
-
-//        Mat x1(1,8,CV_64F,data);
-//        Mat cf(8,8,CV_64F,coeff);
-//
-//        Mat d = x1 * cf;
-//        if(d.at<double>(0)>4203)
-//            found.push_back(possibleBlob.currentBoundingRect);
     }
 
     size_t i, j;
@@ -126,10 +119,6 @@ std::vector<cv::Rect> BGSDetector::detect(cv::Mat &img)
                 break;
         if (j==found.size())
         {
-//            r.x += cvRound(r.width*0.1);
-//            r.width = cvRound(r.width*0.8);
-//            r.y += cvRound(r.height*0.07);
-//            r.height = cvRound(r.height*0.8);
             detections.push_back(r);
             Mat histogram;
             Histogram::calcHist(img,shape,r,histogram);
@@ -322,9 +311,4 @@ Blob::Blob(std::vector<cv::Point> _contour)
     dblCurrentDiagonalSize = sqrt(pow(currentBoundingRect.width, 2) + pow(currentBoundingRect.height, 2));
 
     dblCurrentAspectRatio = (float)currentBoundingRect.width / (float)currentBoundingRect.height;
-
-    blnStillBeingTracked = true;
-    blnCurrentMatchFoundOrNewBlob = true;
-
-    intNumOfConsecutiveFramesWithoutAMatch = 0;
 }

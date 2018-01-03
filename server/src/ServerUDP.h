@@ -17,6 +17,7 @@
 #include <boost/serialization/vector.hpp>
 #include "Frame.h"
 #include "FrameQueue.h"
+#include<fstream>
 
 #define BUFFER_SIZE 32768
 
@@ -39,6 +40,7 @@ private:
                         std::size_t bytes_transferred);
     Frame frame;
     FrameQueue & frames;
+    ofstream logFile;
 };
 
 

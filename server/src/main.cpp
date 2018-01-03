@@ -136,15 +136,7 @@ int main(int argc, const char * argv[])
                     for(int i=0;i<512;i++)
                     {
                         histogram.at<unsigned short>(i) = frame.histograms[k][i];
-#ifdef LOGGING
-                        logFile <<   histogram.at<unsigned short>(i);
-                        if(i<511)
-                            logFile << ",";
-#endif
                     }
-#ifdef  LOGGING
-                    logFile << endl;
-#endif
                     histogram.convertTo(histogram,CV_32F);
                     normalize(histogram, normalizedHistogram, 1,0, cv::NORM_MINMAX);
                     histograms.push_back(normalizedHistogram);

@@ -8,7 +8,8 @@ ServerUDP::ServerUDP(boost::asio::io_service &io_service,
                      unsigned short port,
                      FrameQueue &frames):
 socket_(io_service, udp::endpoint(udp::v4(), port)),
-frames(frames)
+frames(frames),
+logFile("../packet.csv")
 {
     start_receive();
 }
@@ -32,6 +33,8 @@ void ServerUDP::handle_receive(const boost::system::error_code &error,
         net_len = net_len | (rx_buffer[1] << 8);
         net_len = net_len | (rx_buffer[2] << 16);
         net_len = net_len | (rx_buffer[3] << 24);
+
+        logFile << net_len << endl;
 
 
         std::string archive_data;

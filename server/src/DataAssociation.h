@@ -10,6 +10,7 @@
 #include<iostream>
 #include <opencv2/opencv.hpp>
 #include "hungarian.h"
+#include <fstream>
 
 
 using namespace std;
@@ -34,9 +35,10 @@ private:
     int HEIGHT;
     double averageError(Point2f a, Point2f b);
     double averageError(Point2f a, Point2f b,MatND hisA,MatND histB);
-    double sigma_propagate[NUM_STATES]={10.0, 10.0, 1.0, 1.0};
+    double sigma_propagate[NUM_STATES]={5.0, 5.0, 1.0, 1.0};
     double var_m=0.5;
-    double alpha = 0.4;
+    double alpha = 0.5;
+    ofstream dataFile;
 };
 
 

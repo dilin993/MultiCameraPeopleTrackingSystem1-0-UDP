@@ -11,6 +11,12 @@
 #include "CameraConfig.h"
 #include "ServerUDP.h"
 
+#define LOGGING 0
+
+#ifdef LOGGING
+#include<fstream>
+#endif
+
 #define DISPLAY_FLAG 1
 
 using namespace std;
@@ -33,6 +39,9 @@ int main(int argc, const char * argv[])
         unsigned short HEIGHT = 0;
         vector<CameraConfig> cameraConfigs;
         double DIST_TH;
+#ifdef LOGGING
+        ofstream logFile("./rx_data.csv");
+#endif
 
         if(argc>1)
         {
@@ -70,7 +79,7 @@ int main(int argc, const char * argv[])
         }
 
         Graph graph(DIST_TH);
-        vector<DataAssociation> associations(num_nodes);
+        vector<DataAssociation*> associations(num_nodes);
 
 #ifdef DISPLAY_FLAG
         vector<Mat> imgs(num_nodes);
@@ -80,7 +89,7 @@ int main(int argc, const char * argv[])
         for(unsigned short n=0;n<num_nodes;n++)
         {
             windowNames[n] = "camera" + to_string(cameraConfigs[n].getCameraID());
-            associations[n] = DataAssociation(cameraConfigs[n].getTRACK_INIT_TH(),
+            associations[n] = new DataAssociation(cameraConfigs[n].getTRACK_INIT_TH(),
                                               cameraConfigs[n].getREJ_TOL(),
                                               WIDTH,HEIGHT);
 #ifdef DISPLAY_FLAG
@@ -90,10 +99,8 @@ int main(int argc, const char * argv[])
 
         char chCheckForEscKey = 0;
         int sizes[3] = {8,8,8};
-        MatND histogram(3,sizes,CV_32F);
         vector<Point2f> detections;
-        vector<MatND> histograms;
-        MatND normalizedHistogram(3,sizes,CV_32F);
+        vector<Mat> histograms;
         uint8_t n;
         int k=0;
         vector<TrackedPoint> groundPlanePoints;
@@ -125,19 +132,28 @@ int main(int argc, const char * argv[])
                     // track bottom middle point
                     detections.push_back(Point(bbox.x+bbox.width/2,bbox.y+bbox.height));
 
-
+                    Mat normalizedHistogram(512,1,CV_32F),histogram(512,1,CV_16U);
                     for(int i=0;i<512;i++)
                     {
-                        histogram.at<float>(i) = (float)frame.histograms[k][i];
+                        histogram.at<unsigned short>(i) = frame.histograms[k][i];
+#ifdef LOGGING
+                        logFile <<   histogram.at<unsigned short>(i);
+                        if(i<511)
+                            logFile << ",";
+#endif
                     }
-
-                    normalize( histogram, normalizedHistogram, 0, 1, cv::NORM_MINMAX, -1, cv::Mat());
-                    histograms.push_back(histogram);
+#ifdef  LOGGING
+                    logFile << endl;
+#endif
+                    histogram.convertTo(histogram,CV_32F);
+                    normalize(histogram, normalizedHistogram, 1,0, cv::NORM_MINMAX);
+                    histograms.push_back(normalizedHistogram);
                     k++;
+
                 }
 
-                associations[n].assignTracks(detections,histograms);
-                vector<ParticleFilterTracker> &tracks = associations[n].getTracks();
+                associations[n]->assignTracks(detections,histograms);
+                vector<ParticleFilterTracker> &tracks = associations[n]->getTracks();
 
 #ifdef DISPLAY_FLAG
                 // draw detections
@@ -148,9 +164,10 @@ int main(int argc, const char * argv[])
                 for(int i=0;i<tracks.size();i++)
                 {
                     Point2f pos = tracks[i].getPos();
-                    drawMarker(imgs[n], pos,
-                               tracks[i].color,
-                               MarkerTypes::MARKER_CROSS, 20, 5);
+//                    if(tracks[i].totalVisibleCount>30)
+                        drawMarker(imgs[n], pos,
+                                   tracks[i].color,
+                                   MarkerTypes::MARKER_CROSS, 20, 5);
                     pos = cameraConfigs[n].convertToGround(pos);
                     groundPlanePoints.push_back(TrackedPoint(tracks[i].histogram,
                                                              pos));

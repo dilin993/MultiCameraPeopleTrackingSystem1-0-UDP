@@ -24,7 +24,7 @@ void Histogram::calcHist(Mat &img, Mat &mask, Rect &region, Mat &histogram)
                 (region.x + region.width) >= j && l>0)
             {
                 index = 64 * (r >> 5) + 8 * (g >> 5) + (b >> 5);
-                histogram.at<short>(index) += 1;
+                histogram.at<unsigned short>(index) += 1;
             }
         }
     }

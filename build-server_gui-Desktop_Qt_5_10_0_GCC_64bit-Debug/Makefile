@@ -52,24 +52,26 @@ OBJECTS_DIR   = ./
 
 SOURCES       = ../server_gui/main.cpp \
 		../server_gui/mainwindow.cpp \
-		../server/src/CameraConfig.cpp \
-		../server/src/DataAssociation.cpp \
-		../server/src/FrameQueue.cpp \
-		../server/src/graph.cpp \
-		../server/src/hungarian.cpp \
-		../server/src/ParticleFilterTracker.cpp \
-		../server/src/pugixml.cpp \
-		../server/src/ServerUDP.cpp qrc_resource.cpp \
+		../server_gui/serverthread.cpp \
+		../server_gui/pugixml.cpp \
+		../server_gui/ParticleFilterTracker.cpp \
+		../server_gui/hungarian.cpp \
+		../server_gui/graph.cpp \
+		../server_gui/FrameQueue.cpp \
+		../server_gui/DataAssociation.cpp \
+		../server_gui/CameraConfig.cpp \
+		../server_gui/ServerUDP.cpp qrc_resource.cpp \
 		moc_mainwindow.cpp
 OBJECTS       = main.o \
 		mainwindow.o \
-		CameraConfig.o \
-		DataAssociation.o \
-		FrameQueue.o \
-		graph.o \
-		hungarian.o \
-		ParticleFilterTracker.o \
+		serverthread.o \
 		pugixml.o \
+		ParticleFilterTracker.o \
+		hungarian.o \
+		graph.o \
+		FrameQueue.o \
+		DataAssociation.o \
+		CameraConfig.o \
 		ServerUDP.o \
 		qrc_resource.o \
 		moc_mainwindow.o
@@ -257,26 +259,27 @@ DIST          = ../../../Qt5.10.0/5.10.0/gcc_64/mkspecs/features/spec_pre.prf \
 		../../../Qt5.10.0/5.10.0/gcc_64/mkspecs/features/yacc.prf \
 		../../../Qt5.10.0/5.10.0/gcc_64/mkspecs/features/lex.prf \
 		../server_gui/server_gui.pro ../server_gui/mainwindow.h \
-		../server/src/CameraConfig.h \
-		../server/src/connection.hpp \
-		../server/src/DataAssociation.h \
-		../server/src/Frame.h \
-		../server/src/FrameQueue.h \
-		../server/src/graph.h \
-		../server/src/hungarian.h \
-		../server/src/ParticleFilterTracker.h \
-		../server/src/pugiconfig.hpp \
-		../server/src/pugixml.hpp \
-		../server/src/ServerUDP.h ../server_gui/main.cpp \
+		../server_gui/serverthread.h \
+		../server_gui/pugixml.hpp \
+		../server_gui/pugiconfig.hpp \
+		../server_gui/ParticleFilterTracker.h \
+		../server_gui/hungarian.h \
+		../server_gui/graph.h \
+		../server_gui/FrameQueue.h \
+		../server_gui/Frame.h \
+		../server_gui/DataAssociation.h \
+		../server_gui/CameraConfig.h \
+		../server_gui/ServerUDP.h ../server_gui/main.cpp \
 		../server_gui/mainwindow.cpp \
-		../server/src/CameraConfig.cpp \
-		../server/src/DataAssociation.cpp \
-		../server/src/FrameQueue.cpp \
-		../server/src/graph.cpp \
-		../server/src/hungarian.cpp \
-		../server/src/ParticleFilterTracker.cpp \
-		../server/src/pugixml.cpp \
-		../server/src/ServerUDP.cpp
+		../server_gui/serverthread.cpp \
+		../server_gui/pugixml.cpp \
+		../server_gui/ParticleFilterTracker.cpp \
+		../server_gui/hungarian.cpp \
+		../server_gui/graph.cpp \
+		../server_gui/FrameQueue.cpp \
+		../server_gui/DataAssociation.cpp \
+		../server_gui/CameraConfig.cpp \
+		../server_gui/ServerUDP.cpp
 QMAKE_TARGET  = server_gui
 DESTDIR       = 
 TARGET        = server_gui
@@ -681,8 +684,8 @@ distdir: FORCE
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents ../server_gui/resource.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents ../../../Qt5.10.0/5.10.0/gcc_64/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../server_gui/mainwindow.h ../server/src/CameraConfig.h ../server/src/connection.hpp ../server/src/DataAssociation.h ../server/src/Frame.h ../server/src/FrameQueue.h ../server/src/graph.h ../server/src/hungarian.h ../server/src/ParticleFilterTracker.h ../server/src/pugiconfig.hpp ../server/src/pugixml.hpp ../server/src/ServerUDP.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../server_gui/main.cpp ../server_gui/mainwindow.cpp ../server/src/CameraConfig.cpp ../server/src/DataAssociation.cpp ../server/src/FrameQueue.cpp ../server/src/graph.cpp ../server/src/hungarian.cpp ../server/src/ParticleFilterTracker.cpp ../server/src/pugixml.cpp ../server/src/ServerUDP.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../server_gui/mainwindow.h ../server_gui/serverthread.h ../server_gui/pugixml.hpp ../server_gui/pugiconfig.hpp ../server_gui/ParticleFilterTracker.h ../server_gui/hungarian.h ../server_gui/graph.h ../server_gui/FrameQueue.h ../server_gui/Frame.h ../server_gui/DataAssociation.h ../server_gui/CameraConfig.h ../server_gui/ServerUDP.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../server_gui/main.cpp ../server_gui/mainwindow.cpp ../server_gui/serverthread.cpp ../server_gui/pugixml.cpp ../server_gui/ParticleFilterTracker.cpp ../server_gui/hungarian.cpp ../server_gui/graph.cpp ../server_gui/FrameQueue.cpp ../server_gui/DataAssociation.cpp ../server_gui/CameraConfig.cpp ../server_gui/ServerUDP.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../server_gui/mainwindow.ui $(DISTDIR)/
 
 
@@ -842,6 +845,23 @@ moc_mainwindow.cpp: ../../../Qt5.10.0/5.10.0/gcc_64/include/QtWidgets/QMainWindo
 		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qfileinfo.h \
 		../../../Qt5.10.0/5.10.0/gcc_64/include/QtWidgets/qdialog.h \
 		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/QStringList \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/QFileInfo \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/QSettings \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qsettings.h \
+		../server_gui/pugixml.hpp \
+		../server_gui/pugiconfig.hpp \
+		../server_gui/DataAssociation.h \
+		../server_gui/ParticleFilterTracker.h \
+		../server_gui/hungarian.h \
+		../server_gui/graph.h \
+		../server_gui/CameraConfig.h \
+		../server_gui/serverthread.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/QThread \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qthread.h \
+		../server_gui/ServerUDP.h \
+		../server_gui/Frame.h \
+		../server_gui/FrameQueue.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/QMutex \
 		../server_gui/mainwindow.h \
 		moc_predefs.h \
 		../../../Qt5.10.0/5.10.0/gcc_64/bin/moc
@@ -981,6 +1001,23 @@ main.o: ../server_gui/main.cpp ../server_gui/mainwindow.h \
 		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qfileinfo.h \
 		../../../Qt5.10.0/5.10.0/gcc_64/include/QtWidgets/qdialog.h \
 		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/QStringList \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/QFileInfo \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/QSettings \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qsettings.h \
+		../server_gui/pugixml.hpp \
+		../server_gui/pugiconfig.hpp \
+		../server_gui/DataAssociation.h \
+		../server_gui/ParticleFilterTracker.h \
+		../server_gui/hungarian.h \
+		../server_gui/graph.h \
+		../server_gui/CameraConfig.h \
+		../server_gui/serverthread.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/QThread \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qthread.h \
+		../server_gui/ServerUDP.h \
+		../server_gui/Frame.h \
+		../server_gui/FrameQueue.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/QMutex \
 		../../../Qt5.10.0/5.10.0/gcc_64/include/QtWidgets/QApplication \
 		../../../Qt5.10.0/5.10.0/gcc_64/include/QtWidgets/qapplication.h \
 		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qcoreapplication.h \
@@ -1103,6 +1140,23 @@ mainwindow.o: ../server_gui/mainwindow.cpp ../server_gui/mainwindow.h \
 		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qfileinfo.h \
 		../../../Qt5.10.0/5.10.0/gcc_64/include/QtWidgets/qdialog.h \
 		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/QStringList \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/QFileInfo \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/QSettings \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qsettings.h \
+		../server_gui/pugixml.hpp \
+		../server_gui/pugiconfig.hpp \
+		../server_gui/DataAssociation.h \
+		../server_gui/ParticleFilterTracker.h \
+		../server_gui/hungarian.h \
+		../server_gui/graph.h \
+		../server_gui/CameraConfig.h \
+		../server_gui/serverthread.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/QThread \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qthread.h \
+		../server_gui/ServerUDP.h \
+		../server_gui/Frame.h \
+		../server_gui/FrameQueue.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/QMutex \
 		ui_mainwindow.h \
 		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/QVariant \
 		../../../Qt5.10.0/5.10.0/gcc_64/include/QtWidgets/QAction \
@@ -1153,9 +1207,15 @@ mainwindow.o: ../server_gui/mainwindow.cpp ../server_gui/mainwindow.h \
 		../../../Qt5.10.0/5.10.0/gcc_64/include/QtWidgets/qlineedit.h \
 		../../../Qt5.10.0/5.10.0/gcc_64/include/QtGui/qtextcursor.h \
 		../../../Qt5.10.0/5.10.0/gcc_64/include/QtGui/qtextformat.h \
-		../../../Qt5.10.0/5.10.0/gcc_64/include/QtWidgets/QListWidget \
-		../../../Qt5.10.0/5.10.0/gcc_64/include/QtWidgets/qlistwidget.h \
-		../../../Qt5.10.0/5.10.0/gcc_64/include/QtWidgets/qlistview.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtWidgets/QPlainTextEdit \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtWidgets/qplaintextedit.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtWidgets/qtextedit.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtGui/qtextdocument.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtGui/qabstracttextdocumentlayout.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtGui/qtextlayout.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtGui/qglyphrun.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtGui/qrawfont.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtGui/qfontdatabase.h \
 		../../../Qt5.10.0/5.10.0/gcc_64/include/QtWidgets/QPushButton \
 		../../../Qt5.10.0/5.10.0/gcc_64/include/QtWidgets/qpushbutton.h \
 		../../../Qt5.10.0/5.10.0/gcc_64/include/QtWidgets/qabstractbutton.h \
@@ -1166,38 +1226,199 @@ mainwindow.o: ../server_gui/mainwindow.cpp ../server_gui/mainwindow.h \
 		../../../Qt5.10.0/5.10.0/gcc_64/include/QtWidgets/QWidget
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o ../server_gui/mainwindow.cpp
 
-CameraConfig.o: ../server/src/CameraConfig.cpp ../server/src/CameraConfig.h \
-		../server/src/pugixml.hpp \
-		../server/src/pugiconfig.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o CameraConfig.o ../server/src/CameraConfig.cpp
+serverthread.o: ../server_gui/serverthread.cpp ../server_gui/serverthread.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/QThread \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qthread.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qobject.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qobjectdefs.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qnamespace.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qglobal.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qconfig-bootstrapped.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qconfig.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qtcore-config.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qsystemdetection.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qprocessordetection.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qcompilerdetection.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qtypeinfo.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qsysinfo.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qlogging.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qflags.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qatomic.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qbasicatomic.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qgenericatomic.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qatomic_cxx11.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qatomic_msvc.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qglobalstatic.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qmutex.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qnumeric.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qversiontagging.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qstring.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qchar.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qbytearray.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qrefcount.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qarraydata.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qstringliteral.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qstringalgorithms.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qstringview.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qstringbuilder.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qlist.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qalgorithms.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qiterator.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qhashfunctions.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qpair.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qbytearraylist.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qstringlist.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qregexp.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qstringmatcher.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qcoreevent.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qscopedpointer.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qmetatype.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qvarlengtharray.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qcontainerfwd.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qobject_impl.h \
+		../server_gui/ServerUDP.h \
+		../server_gui/Frame.h \
+		../server_gui/FrameQueue.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/QMutex
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o serverthread.o ../server_gui/serverthread.cpp
 
-DataAssociation.o: ../server/src/DataAssociation.cpp ../server/src/DataAssociation.h \
-		../server/src/ParticleFilterTracker.h \
-		../server/src/hungarian.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DataAssociation.o ../server/src/DataAssociation.cpp
+pugixml.o: ../server_gui/pugixml.cpp ../server_gui/pugixml.hpp \
+		../server_gui/pugiconfig.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o pugixml.o ../server_gui/pugixml.cpp
 
-FrameQueue.o: ../server/src/FrameQueue.cpp ../server/src/FrameQueue.h \
-		../server/src/Frame.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o FrameQueue.o ../server/src/FrameQueue.cpp
+ParticleFilterTracker.o: ../server_gui/ParticleFilterTracker.cpp ../server_gui/ParticleFilterTracker.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ParticleFilterTracker.o ../server_gui/ParticleFilterTracker.cpp
 
-graph.o: ../server/src/graph.cpp ../server/src/graph.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o graph.o ../server/src/graph.cpp
+hungarian.o: ../server_gui/hungarian.cpp ../server_gui/hungarian.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o hungarian.o ../server_gui/hungarian.cpp
 
-hungarian.o: ../server/src/hungarian.cpp ../server/src/hungarian.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o hungarian.o ../server/src/hungarian.cpp
+graph.o: ../server_gui/graph.cpp ../server_gui/graph.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o graph.o ../server_gui/graph.cpp
 
-ParticleFilterTracker.o: ../server/src/ParticleFilterTracker.cpp ../server/src/ParticleFilterTracker.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ParticleFilterTracker.o ../server/src/ParticleFilterTracker.cpp
+FrameQueue.o: ../server_gui/FrameQueue.cpp ../server_gui/FrameQueue.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/QThread \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qthread.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qobject.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qobjectdefs.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qnamespace.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qglobal.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qconfig-bootstrapped.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qconfig.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qtcore-config.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qsystemdetection.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qprocessordetection.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qcompilerdetection.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qtypeinfo.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qsysinfo.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qlogging.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qflags.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qatomic.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qbasicatomic.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qgenericatomic.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qatomic_cxx11.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qatomic_msvc.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qglobalstatic.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qmutex.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qnumeric.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qversiontagging.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qstring.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qchar.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qbytearray.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qrefcount.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qarraydata.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qstringliteral.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qstringalgorithms.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qstringview.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qstringbuilder.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qlist.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qalgorithms.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qiterator.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qhashfunctions.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qpair.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qbytearraylist.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qstringlist.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qregexp.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qstringmatcher.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qcoreevent.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qscopedpointer.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qmetatype.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qvarlengtharray.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qcontainerfwd.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qobject_impl.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/QMutex \
+		../server_gui/Frame.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o FrameQueue.o ../server_gui/FrameQueue.cpp
 
-pugixml.o: ../server/src/pugixml.cpp ../server/src/pugixml.hpp \
-		../server/src/pugiconfig.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o pugixml.o ../server/src/pugixml.cpp
+DataAssociation.o: ../server_gui/DataAssociation.cpp ../server_gui/DataAssociation.h \
+		../server_gui/ParticleFilterTracker.h \
+		../server_gui/hungarian.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DataAssociation.o ../server_gui/DataAssociation.cpp
 
-ServerUDP.o: ../server/src/ServerUDP.cpp ../server/src/ServerUDP.h \
-		../server/src/connection.hpp \
-		../server/src/Frame.h \
-		../server/src/FrameQueue.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ServerUDP.o ../server/src/ServerUDP.cpp
+CameraConfig.o: ../server_gui/CameraConfig.cpp ../server_gui/CameraConfig.h \
+		../server_gui/pugixml.hpp \
+		../server_gui/pugiconfig.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o CameraConfig.o ../server_gui/CameraConfig.cpp
+
+ServerUDP.o: ../server_gui/ServerUDP.cpp ../server_gui/ServerUDP.h \
+		../server_gui/Frame.h \
+		../server_gui/FrameQueue.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/QThread \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qthread.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qobject.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qobjectdefs.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qnamespace.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qglobal.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qconfig-bootstrapped.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qconfig.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qtcore-config.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qsystemdetection.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qprocessordetection.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qcompilerdetection.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qtypeinfo.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qsysinfo.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qlogging.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qflags.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qatomic.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qbasicatomic.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qgenericatomic.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qatomic_cxx11.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qatomic_msvc.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qglobalstatic.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qmutex.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qnumeric.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qversiontagging.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qstring.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qchar.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qbytearray.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qrefcount.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qarraydata.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qstringliteral.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qstringalgorithms.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qstringview.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qstringbuilder.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qlist.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qalgorithms.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qiterator.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qhashfunctions.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qpair.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qbytearraylist.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qstringlist.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qregexp.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qstringmatcher.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qcoreevent.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qscopedpointer.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qmetatype.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qvarlengtharray.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qcontainerfwd.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/qobject_impl.h \
+		../../../Qt5.10.0/5.10.0/gcc_64/include/QtCore/QMutex
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ServerUDP.o ../server_gui/ServerUDP.cpp
 
 qrc_resource.o: qrc_resource.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qrc_resource.o qrc_resource.cpp

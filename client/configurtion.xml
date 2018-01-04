@@ -3,8 +3,8 @@
 <configuration>
 
     <server ip="localhost" port="8080"/>
-    <video source="/home/dilin/Videos/Webcam/2017-11-06-153922.webm" width="320" height="240" fps="10"/>
-    <camera id="0"/>
+    <video source="/dev/video0" width="320" height="240" fps="10"/>
+    <camera id="1"/>
     <detector source="/home/dilin/fyp/MultiCameraPeopleTrackingSystem1-0-UDP/client/pca.xml" training="false" bgs_th="30"/>
 
 </configuration>

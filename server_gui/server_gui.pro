@@ -26,29 +26,30 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    ../server/src/CameraConfig.cpp \
-    ../server/src/DataAssociation.cpp \
-    ../server/src/FrameQueue.cpp \
-    ../server/src/graph.cpp \
-    ../server/src/hungarian.cpp \
-    ../server/src/ParticleFilterTracker.cpp \
-    ../server/src/pugixml.cpp \
-    ../server/src/ServerUDP.cpp
+        serverthread.cpp \
+    pugixml.cpp \
+    ParticleFilterTracker.cpp \
+    hungarian.cpp \
+    graph.cpp \
+    FrameQueue.cpp \
+    DataAssociation.cpp \
+    CameraConfig.cpp \
+    ServerUDP.cpp
 
 
 HEADERS += \
         mainwindow.h \
-    ../server/src/CameraConfig.h \
-    ../server/src/connection.hpp \
-    ../server/src/DataAssociation.h \
-    ../server/src/Frame.h \
-    ../server/src/FrameQueue.h \
-    ../server/src/graph.h \
-    ../server/src/hungarian.h \
-    ../server/src/ParticleFilterTracker.h \
-    ../server/src/pugiconfig.hpp \
-    ../server/src/pugixml.hpp \
-    ../server/src/ServerUDP.h
+        serverthread.h \
+    pugixml.hpp \
+    pugiconfig.hpp \
+    ParticleFilterTracker.h \
+    hungarian.h \
+    graph.h \
+    FrameQueue.h \
+    Frame.h \
+    DataAssociation.h \
+    CameraConfig.h \
+    ServerUDP.h
 
 LIBS += `pkg-config opencv --libs` \
         -lboost_system \

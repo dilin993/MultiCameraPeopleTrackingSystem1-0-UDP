@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/Tab_Icons">
+        <file>icons/movie_camera.png</file>
+        <file>icons/options-512.png</file>
+        <file>icons/cctv.png</file>
+        <file>icons/analysis.png</file>
+        <file>icons/heatmap.png</file>
+        <file>icons/tracking.png</file>
+        <file>icons/server.jpeg</file>
+    </qresource>
+</RCC>

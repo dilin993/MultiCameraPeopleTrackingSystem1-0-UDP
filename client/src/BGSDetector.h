@@ -16,7 +16,6 @@
 class Blob
 {
 public:
-    // member variables ///////////////////////////////////////////////////////////////////////////
     Blob(std::vector<cv::Point> _contour);
     std::vector<cv::Point> currentContour;
 
@@ -27,13 +26,6 @@ public:
     double dblCurrentDiagonalSize;
     double dblCurrentAspectRatio;
 
-    bool blnCurrentMatchFoundOrNewBlob;
-
-    bool blnStillBeingTracked;
-
-    int intNumOfConsecutiveFramesWithoutAMatch;
-
-    cv::Point predictedNextPosition;
 };
 
 enum

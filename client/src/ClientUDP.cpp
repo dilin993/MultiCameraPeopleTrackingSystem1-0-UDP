@@ -25,7 +25,11 @@ void ClientUDP::send(Frame frame)
     std::string outbound_data_ = archive_stream.str();
 
     uint32_t net_len = (uint32_t)outbound_data_.length();
-    cout << "net len: " << net_len << endl;
+
+    if(net_len>BUFFER_SIZE)
+        throw runtime_error("Packet length exceeds buffer size! len: "
+                            + to_string(net_len));
+
     tx_buffer[0] = (unsigned char)(net_len >> 0);
     tx_buffer[1] = (unsigned char)(net_len >> 8);
     tx_buffer[2] = (unsigned char)(net_len >> 16);

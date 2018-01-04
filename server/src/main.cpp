@@ -4,18 +4,13 @@
 
 #include <iostream>
 #include <thread>
-#include "Server.h"
 #include "pugixml.hpp"
 #include "DataAssociation.h"
 #include "graph.h"
 #include "CameraConfig.h"
 #include "ServerUDP.h"
 
-#define LOGGING 0
 
-#ifdef LOGGING
-#include<fstream>
-#endif
 
 #define DISPLAY_FLAG 1
 
@@ -39,9 +34,6 @@ int main(int argc, const char * argv[])
         unsigned short HEIGHT = 0;
         vector<CameraConfig> cameraConfigs;
         double DIST_TH;
-#ifdef LOGGING
-        ofstream logFile("./rx_data.csv");
-#endif
 
         if(argc>1)
         {

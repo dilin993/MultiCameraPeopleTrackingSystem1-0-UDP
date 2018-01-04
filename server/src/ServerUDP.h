@@ -40,7 +40,6 @@ private:
                         std::size_t bytes_transferred);
     Frame frame;
     FrameQueue & frames;
-    ofstream logFile;
 };
 
 

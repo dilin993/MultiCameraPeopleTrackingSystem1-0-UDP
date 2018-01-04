@@ -143,7 +143,7 @@ int main(int argc, const char *argv[])
                     frame.histograms.push_back(histogram);
                 }
                 frameNo++;
-
+                frame.set_now();
                 client->send(frame);
             }
 

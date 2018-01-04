@@ -6,7 +6,8 @@
 #define CLIENT_FRAME_H
 
 #include <boost/serialization/vector.hpp>
-#include <boost/chrono.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/date_time/posix_time/time_serialize.hpp>
 #include <iostream>
 #include <opencv2/opencv.hpp>
 
@@ -14,33 +15,36 @@
 using namespace std;
 using namespace cv;
 
-namespace boost {
-    namespace archive {
+typedef boost::posix_time::ptime Time;
+typedef boost::posix_time::time_duration TimeDuration;
 
-        namespace chrn = boost::chrono;
-
-        template<class Archive, typename clock>
-        void load(Archive& ar, chrn::time_point<clock>& tp, unsigned)
-        {
-            chrn::milliseconds::rep millis;
-            ar & millis;
-            tp = chrn::time_point<clock>(chrn::milliseconds(millis));
-        }
-
-        template<class Archive, typename clock>
-        void save(Archive& ar, chrn::time_point<clock> const& tp, unsigned)
-        {
-            chrn::milliseconds::rep millis = chrn::duration_cast<chrn::milliseconds>(tp.time_since_epoch()).count();
-            ar & millis;
-        }
-
-        template<class Archive, typename clock>
-        inline void serialize(Archive & ar, chrn::time_point<clock>& tp, unsigned version)
-        {
-            boost::serialization::split_free(ar, tp, version);
-        }
-    }
-}
+//namespace boost {
+//    namespace archive {
+//
+//        namespace chrn = boost::chrono;
+//
+//        template<class Archive, typename clock>
+//        void load(Archive& ar, chrn::time_point<clock>& tp, unsigned)
+//        {
+//            chrn::milliseconds::rep millis;
+//            ar & millis;
+//            tp = chrn::time_point<clock>(chrn::milliseconds(millis));
+//        }
+//
+//        template<class Archive, typename clock>
+//        void save(Archive& ar, chrn::time_point<clock> const& tp, unsigned)
+//        {
+//            chrn::milliseconds::rep millis = chrn::duration_cast<chrn::milliseconds>(tp.time_since_epoch()).count();
+//            ar & millis;
+//        }
+//
+//        template<class Archive, typename clock>
+//        inline void serialize(Archive & ar, chrn::time_point<clock>& tp, unsigned version)
+//        {
+//            boost::serialization::split_free(ar, tp, version);
+//        }
+//    }
+//}
 
 
 struct BoundingBox
@@ -67,7 +71,7 @@ public:
     vector<vector<uint16_t >> histograms;
     uint16_t frameNo;
     uint8_t cameraID;
-    boost::chrono::high_resolution_clock::time_point timeStamp;
+    Time timeStamp;
 
     template <typename Archive>
     void serialize(Archive& ar, const unsigned int version)
@@ -98,7 +102,7 @@ public:
 
     void set_now()
     {
-        timeStamp = boost::chrono::high_resolution_clock::now();
+        timeStamp = Time(boost::posix_time::microsec_clock::local_time());
     }
 
 };

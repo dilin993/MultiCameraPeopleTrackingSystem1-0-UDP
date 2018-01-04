@@ -8,8 +8,7 @@ ServerUDP::ServerUDP(boost::asio::io_service &io_service,
                      unsigned short port,
                      FrameQueue &frames):
 socket_(io_service, udp::endpoint(udp::v4(), port)),
-frames(frames),
-logFile("../packet.csv")
+frames(frames)
 {
     start_receive();
 }
@@ -29,12 +28,13 @@ void ServerUDP::handle_receive(const boost::system::error_code &error,
     if (!error || error == boost::asio::error::message_size)
     {
         uint32_t net_len = 0;
+
+        assert(net_len<=BUFFER_SIZE);
+
         net_len = net_len | rx_buffer[0];
         net_len = net_len | (rx_buffer[1] << 8);
         net_len = net_len | (rx_buffer[2] << 16);
         net_len = net_len | (rx_buffer[3] << 24);
-
-        logFile << net_len << endl;
 
 
         std::string archive_data;
@@ -47,13 +47,12 @@ void ServerUDP::handle_receive(const boost::system::error_code &error,
         Frame t;
         archive >> t;
 
-        boost::chrono::high_resolution_clock::time_point stop =
-                boost::chrono::high_resolution_clock::now();
-        boost::chrono::high_resolution_clock::time_point start = t.timeStamp;
+        Time stop(boost::posix_time::microsec_clock::local_time());
+        TimeDuration timeDuration = stop - t.timeStamp;
         std::cout
-                << "packet delay = "
-                << boost::chrono::duration_cast<boost::chrono::milliseconds>(stop - start).count()
-                << " ms"
+                << "########### packet delay = "
+                << timeDuration.total_microseconds()
+                << " us ###########"
                 << std::endl;
 
         frames.enqueue(t);

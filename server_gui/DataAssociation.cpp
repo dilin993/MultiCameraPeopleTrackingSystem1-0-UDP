@@ -159,6 +159,16 @@ void DataAssociation::setSize(int width, int height)
     HEIGHT = height;
 }
 
+void DataAssociation::setTimeStamp(Time timeStamp)
+{
+    this->timeStamp = timeStamp;
+}
+
+const Time DataAssociation::getTimeStamp()
+{
+    return this->timeStamp;
+}
+
 DataAssociation::DataAssociation() :
         DataAssociation(0,0,0,0)
 {

@@ -14,7 +14,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(doTracking()));
-    timer->start(100);
 
     camScenes[0] = new QGraphicsScene(this);
     ui->gvCam1->setScene(camScenes[0]);
@@ -114,6 +113,8 @@ void MainWindow::on_btnStartServer_clicked()
         HEIGHT = (unsigned short)config.child("main").attribute("height").as_int();
         DIST_TH = config.child("main").attribute("dist_th").as_double();
 
+        graph = new Graph(DIST_TH);
+
         for(unsigned short n=0;n<NUM_NODES;n++)
         {
             string camName = "camera" + to_string(n);
@@ -134,6 +135,7 @@ void MainWindow::on_btnStartServer_clicked()
         serverThread = new ServerThread(frames,PORT);
         serverThread->start();
         ui->txtConsole->appendPlainText(tr("Server started...\n"));
+        timer->start(100); // Start time to handle frames
     }
     else
     {
@@ -176,6 +178,7 @@ void MainWindow::doTracking()
 
         }
         associations[n]->assignTracks(detections,histograms);
+        associations[n]->setTimeStamp(frame.timeStamp);
         vector<ParticleFilterTracker> &tracks = associations[n]->getTracks();
         for(unsigned int i=0;i<tracks.size();i++)
         {
@@ -185,9 +188,27 @@ void MainWindow::doTracking()
                        MarkerTypes::MARKER_CROSS, 20, 5);
 
         }
-
-        updateScenes();
-
-
     }
+
+    vector<TrackedPoint> groundPlanePoints;
+    graph->clear();
+    for(int i=0;i<NUM_NODES;i++)
+    {
+        vector<ParticleFilterTracker> &tracks = associations[i]->getTracks();
+        for(int j=0;j<tracks.size();j++)
+        {
+            Point2f pos = tracks[j].getPos();
+            pos = cameraConfigs[i].convertToGround(pos);
+            groundPlanePoints.push_back(TrackedPoint(tracks[j].histogram,
+                                                     pos,
+                                                     tracks[j].color));
+        }
+        // do correspondence estimation
+        graph->addNodes((uint8_t)i,groundPlanePoints);
+    }
+
+    vector<Point2f> uniquePoints = graph->getUniquePoints();
+
+    updateScenes();
+
 }

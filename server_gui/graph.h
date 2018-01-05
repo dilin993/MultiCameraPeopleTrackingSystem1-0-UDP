@@ -11,9 +11,10 @@
 struct TrackedPoint
 {
 public:
-    TrackedPoint(cv::MatND histogram,cv::Point2f location);
+    TrackedPoint(cv::MatND histogram,cv::Point2f location,cv::Scalar color);
     cv::MatND histogram;
     cv::Point2f location;
+    cv::Scalar color;
 };
 
 
@@ -34,6 +35,7 @@ public:
     void addNode(uint8_t cameraID,TrackedPoint trackedPoint);
     void addNodes(uint8_t cameraID,std::vector<TrackedPoint> trackedPoints);
     std::vector<cv::Point2f> getUniquePoints();
+    void clear();
 
 private:
     std::vector<GraphNode> nodes;

@@ -135,6 +135,11 @@ std::vector<cv::Point2f> Graph::getUniquePoints()
     return uniquePoints;
 }
 
+void Graph::clear()
+{
+    nodes.clear();
+}
+
 void Graph::addNodes(uint8_t cameraID, std::vector<TrackedPoint> trackedPoints)
 {
     for(auto const & trackedPoint: trackedPoints)
@@ -151,8 +156,9 @@ GraphNode::GraphNode(uint8_t id, TrackedPoint trackedPoint)
 }
 
 
-TrackedPoint::TrackedPoint(cv::MatND histogram, cv::Point2f location)
+TrackedPoint::TrackedPoint(cv::MatND histogram,cv::Point2f location,cv::Scalar color)
 {
     this->histogram = histogram.clone();
     this->location = location;
+    this->color = color;
 }

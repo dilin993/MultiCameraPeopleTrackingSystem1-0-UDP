@@ -11,6 +11,10 @@
 #include <opencv2/opencv.hpp>
 #include "hungarian.h"
 #include <fstream>
+#include <boost/date_time/posix_time/posix_time.hpp>
+typedef boost::posix_time::ptime Time;
+typedef boost::posix_time::time_duration TimeDuration;
+
 
 
 using namespace std;
@@ -27,6 +31,8 @@ public:
     void assignTracks(vector<Point2f> detections,vector<MatND> histograms);
     ~DataAssociation();
     void setSize(int width,int height);
+    void setTimeStamp(Time timeStamp);
+    const Time getTimeStamp();
 private:
     vector<ParticleFilterTracker> tracks;
     double TRACK_INIT_TH;
@@ -39,6 +45,7 @@ private:
     double var_m=0.5;
     double alpha = 0.5;
     ofstream dataFile;
+    Time timeStamp;
 };
 
 

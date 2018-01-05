@@ -63,6 +63,9 @@ private:
     QGraphicsScene* camScenes[2];
     void updateScenes();
 
+    // Global Tracking
+    Graph* graph;
+
 
 };
 

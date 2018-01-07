@@ -128,7 +128,7 @@ void MainWindow::on_btnStartServer_clicked()
                         new DataAssociation(cameraConfigs[n].getTRACK_INIT_TH(),
                                             cameraConfigs[n].getREJ_TOL(),
                                             WIDTH,HEIGHT));
-            imgs.push_back(Mat(HEIGHT,WIDTH,CV_8UC3));
+            imgs.push_back(Mat::zeros(HEIGHT,WIDTH,CV_8UC3));
         }
         ui->txtConsole->appendPlainText(tr("Configuration loaded.\n"));
         ui->btnStartServer->setEnabled(false);

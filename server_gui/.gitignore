@@ -1,0 +1,11 @@
+cmake-build-debug/*
+CMakeCache.txt
+CMakeFiles/*
+cmake_install.cmake
+Makefile
+client
+.cproject
+.idea/*
+.project
+.settings/*
+../build-server_gui-Desktop_Qt_*

@@ -14,6 +14,14 @@
 #include "graph.h"
 #include "CameraConfig.h"
 #include "serverthread.h"
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QMainWindow>
+#include <QtCharts/QChartView>
+#include <QtCharts/QLineSeries>
+#include <QTime>
+#include <qcustomplot.h>
+
+QT_CHARTS_USE_NAMESPACE
 
 namespace Ui {
 class MainWindow;
@@ -37,6 +45,12 @@ private slots:
     // Object Tracking
     void doTracking();
 
+    //heatmap and global tracking
+    void update_globalTrack(int x, int y);
+    void update_heatmap(int x, int y);
+    void analysis( vector<Point2f> uniquePoints);
+
+
 private:
     Ui::MainWindow *ui;
     QString m_sSettingsFile;
@@ -56,15 +70,45 @@ private:
     FrameQueue frames;
     ServerThread *serverThread;
     QTimer *timer;
+    
 
     // Tracking
     vector<DataAssociation*> associations;
     vector<Mat> imgs;
     QGraphicsScene* camScenes[2];
     void updateScenes();
+   // void analysis( vector<Point2f> uniquePoints);
+
+    QChartView *chartView;
+    QLineSeries *series;
+    QChart *chart;
+    QCustomPlot * m_CustomPlot;
+    // This object will hold the current value as a text
+    // that will appear at the extreme right of the plot,
+    QCPItemText *m_ValueIndex;
+
+    // The time between each update, this
+    // will be  used by the timer to call "updatePlot" slot
+    qreal timeInterval;
+
+    // Data buffers
+    QVector<qreal> m_YData;
+    QVector<qreal> m_XData;
 
     // Global Tracking
     Graph* graph;
+
+    //Heatmap and Global Tracking View
+    QGraphicsScene *imageScene;
+    QGraphicsScene *globalScene;
+    QGraphicsScene *heatmapScene;
+
+    cv::Mat floormap;
+
+    int count;
+
+    cv::Mat map;
+    cv::Mat pallete;
 
 
 };

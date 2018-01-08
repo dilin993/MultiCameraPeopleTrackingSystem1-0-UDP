@@ -185,6 +185,8 @@ void MainWindow::on_btnStartServer_clicked()
                                             WIDTH,HEIGHT));
             imgs.push_back(Mat::zeros(HEIGHT,WIDTH,CV_8UC3));
         }
+
+        globalAssociation = new DataAssociation(0.8,200,320,240); // TODO: Update parameters
         ui->txtConsole->appendPlainText(tr("Configuration loaded.\n"));
         ui->btnStartServer->setEnabled(false);
         serverThread = new ServerThread(frames,PORT);
@@ -263,6 +265,8 @@ void MainWindow::doTracking()
     }
 
     vector<Point2f> uniquePoints = graph->getUniquePoints();
+    globalAssociation->assignTracks(uniquePoints,graph->histograms);
+    vector<ParticleFilterTracker> &globalTracks = globalAssociation->getTracks();
 
     updateScenes();
     analysis( uniquePoints);
@@ -345,7 +349,7 @@ void MainWindow::analysis( vector<Point2f> uniquePoints)
     // Set the coordinate that we calculated
     m_ValueIndex->position->setCoords( indexX , indexY );
     // Set the text that we want to display
-    m_ValueIndex->setText(  QString::number( tmpYYData.last() ) + "  MB/s" );
+    m_ValueIndex->setText(  QString::number( tmpYYData.last() ) + " " );
 
 
     // Update the plot widget

@@ -97,6 +97,7 @@ private:
 
     // Global Tracking
     Graph* graph;
+    DataAssociation* globalAssociation;
 
     //Heatmap and Global Tracking View
     QGraphicsScene *imageScene;

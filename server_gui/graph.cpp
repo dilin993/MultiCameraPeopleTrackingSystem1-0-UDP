@@ -42,6 +42,11 @@ void Graph::calculateCosts()
     }
 }
 
+cv::Mat Graph::combineHistograms(cv::Mat &hist1, cv::Mat &hist2)
+{
+    Mat hist = 0.5*hist1 + 0.5*hist2;
+}
+
 Graph::Graph(double DIST_TH)
 {
     this->DIST_TH = DIST_TH;
@@ -50,6 +55,8 @@ Graph::Graph(double DIST_TH)
 std::vector<cv::Point2f> Graph::getUniquePoints()
 {
     std::vector<cv::Point2f> uniquePoints;
+
+    histograms.clear();
 
 
     double minPosVal = DBL_MAX;
@@ -83,6 +90,9 @@ std::vector<cv::Point2f> Graph::getUniquePoints()
             cv::Point2f p1 = nodes[minI].location;
             cv::Point2f p2 = nodes[minJ].location;
             uniquePoints.push_back(cv::Point2f((p1.x+p2.x)/2,(p1.y+p2.y)/2));
+            Mat histogram = combineHistograms(nodes[minI].histogram,
+                                              nodes[minJ].histogram);
+            histograms.push_back(histogram);
             if(minI>minJ)
             {
                 nodes.erase(nodes.begin()+minI);
@@ -93,33 +103,6 @@ std::vector<cv::Point2f> Graph::getUniquePoints()
                 nodes.erase(nodes.begin()+minJ);
                 nodes.erase(nodes.begin()+minI);
             }
-
-
-
-//            std::set<int,std::greater<int>> similarPoints;
-//            similarPoints.insert(minI);
-//            similarPoints.insert(minJ);
-//            for(int i=0;i<nodes.size();i++)
-//            {
-//                if(i!=minI && i!=minJ && cost[minI][i]<DIST_TH)
-//                    similarPoints.insert(i);
-//            }
-//            for(int i=0;i<nodes.size();i++)
-//            {
-//                if(i!=minI && i!=minJ && cost[minJ][i]<DIST_TH)
-//                    similarPoints.insert(i);
-//            }
-//
-//            cv::Point2f p(0,0);
-//            for(auto const& i:similarPoints)
-//            {
-//                p.x += nodes[i].location.x;
-//                p.y += nodes[i].location.y;
-//                nodes.erase(nodes.begin()+i);
-//            }
-//            p /= (float)similarPoints.size();
-//
-//            uniquePoints.push_back(p);
         }
         else
         {
@@ -130,6 +113,7 @@ std::vector<cv::Point2f> Graph::getUniquePoints()
     for(auto const &node:nodes)
     {
         uniquePoints.push_back(node.location);
+        histograms.push_back(node.histogram);
     }
 
     return uniquePoints;
@@ -156,7 +140,7 @@ GraphNode::GraphNode(uint8_t id, TrackedPoint trackedPoint)
 }
 
 
-TrackedPoint::TrackedPoint(cv::MatND histogram,cv::Point2f location,cv::Scalar color)
+TrackedPoint::TrackedPoint(cv::Mat histogram,cv::Point2f location,cv::Scalar color)
 {
     this->histogram = histogram.clone();
     this->location = location;

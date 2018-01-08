@@ -7,12 +7,50 @@
 #include <csignal>
 #include "BGSDetector.h"
 #include "ClientUDP.h"
+#include "core.h"
 
 #define DISPLAY_MAIN "Display Window"
 
 
 using namespace std;
 using namespace cv;
+
+data_t parameters[IMG_SIZE * MODELS * 3];
+
+
+uint8_t data_array[IMG_SIZE];
+uint8_t out_frame[IMG_SIZE] = { 0 };
+
+void init_params()
+{
+    for (int i = 0; i < IMG_SIZE; i = i + 1) {
+
+        parameters[i * MODELS * 3 + 0] = 0;
+        parameters[i * MODELS * 3 + 1] = 0;
+        //parameters[i * MODELS * 3 + 2] = 0;
+
+        parameters[i * MODELS * 3 + 2] = 4900;
+        parameters[i * MODELS * 3 + 3] = 4900;
+        //parameters[i * MODELS * 3 + 5] = 2500;
+
+        parameters[i * MODELS * 3 + 4] = 0.09;
+        parameters[i * MODELS * 3 + 5] = 0.09;
+        //parameters[i * MODELS * 3 + 8] = 0.07;
+
+    }
+}
+
+void execute(uint8_t *data_array, Mat &outImg, bool init) {
+
+    backsub(data_array, out_frame, init, parameters);
+//	backsub(data_array, out_frame, init);
+    for (int idxRows = 0; idxRows < IMG_H; idxRows++) {
+        for (int idxCols = 0; idxCols < IMG_W; idxCols = idxCols + 1) {
+            outImg.at<unsigned char>(idxRows, idxCols) = out_frame[idxRows
+                                                                    * IMG_W + idxCols];
+        }
+    }
+}
 
 
 BGSDetector *detector;
@@ -83,7 +121,9 @@ int main(int argc, const char *argv[])
         }
 
 
-        Mat img;
+        Mat img,gray;
+        Mat mask(IMG_H, IMG_W, CV_8UC1);
+        bool init = true;
 
         VideoCapture vcap(videoSource);
         if (!vcap.isOpened())
@@ -107,6 +147,8 @@ int main(int argc, const char *argv[])
         int p, k;
         uint16_t frameNo = 0;
 
+        init_params();
+
         for (;;)
         {
 
@@ -117,8 +159,20 @@ int main(int argc, const char *argv[])
                 break;
             }
 
+            cvtColor(img,gray, CV_BGR2GRAY);
 
-            vector<Rect> detections = detector->detect(img);
+            memcpy(data_array, gray.data, IMG_SIZE);
+
+            execute(data_array,mask, init);
+
+            if(init) init = false;
+
+            vector<Rect> detections;
+
+            if(detector->method==BGS_HW)
+                detections = detector->detect(mask);
+            else
+                detections = detector->detect(img);
 
             if (!trainingMode)
             {

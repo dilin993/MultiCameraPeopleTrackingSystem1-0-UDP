@@ -19,7 +19,7 @@ std::vector<cv::Rect> BGSDetector::detect(cv::Mat &img)
         cv::GaussianBlur(imgCopy,imgCopy,cv::Size(3, 3), 0);
         pMOG2->apply(imgCopy,mask);
     }
-    else
+    else if(method==BGS_MOVING_AVERAGE)
     {
         for(int i=2;i>0;i--)
         {
@@ -35,6 +35,10 @@ std::vector<cv::Rect> BGSDetector::detect(cv::Mat &img)
 
         backgroundSubstraction(frames[0],frames[1],frames[2],
                                bgModel,mask,TH);
+    }
+    else
+    {
+        mask = img.clone();
     }
 
 #ifdef BGS_DEBUG_MODE
@@ -95,10 +99,13 @@ std::vector<cv::Rect> BGSDetector::detect(cv::Mat &img)
 
         if(trainingMode)
         {
-            DetectionRecord dr;
-            memcpy(dr.data,record,8* sizeof(float));
-            data.push_back(dr);
-            found.push_back(possibleBlob.currentBoundingRect);
+            if(method!=BGS_HW || (method==BGS_HW && count>=FRAME_WAIT))
+            {
+                DetectionRecord dr;
+                memcpy(dr.data,record,8* sizeof(float));
+                data.push_back(dr);
+                found.push_back(possibleBlob.currentBoundingRect);
+            }
         }
         else
         {
@@ -125,6 +132,14 @@ std::vector<cv::Rect> BGSDetector::detect(cv::Mat &img)
             histograms.push_back(histogram);
         }
 
+    }
+
+    if(count<FRAME_WAIT+1)
+    {
+        count++;
+        cout << "Training GMM: " << count << endl;
+        if(count>=1800)
+            cout << "GMM fully trained!" << endl;
     }
 
     return detections;
@@ -166,9 +181,10 @@ BGSDetector::BGSDetector(double TH,
     frameCount = 0;
     if(method==BGS_GMM)
         pMOG2 = cv::bgsegm::createBackgroundSubtractorMOG(200,
-                                                          6,
+                                                          2,
                                                           0.7,
                                                           0);
+    count = 0;
     if(!trainingMode)
     {
         coeffFile.open(coeffFilePath,FileStorage::READ);

@@ -58,7 +58,11 @@ public:
     QWidget *tab_3;
     QGraphicsView *glob_track_view;
     QWidget *tab_4;
-    QWidget *tab_5;
+    QGraphicsView *heatmap_view;
+    QWidget *Analyss_tab;
+    QGridLayout *gridLayout_4;
+    QGridLayout *analysis_grid;
+    QGridLayout *people_view;
     QStatusBar *statusBar;
 
     void setupUi(QMainWindow *MainWindow)
@@ -327,14 +331,33 @@ public:
         tabWidget->addTab(tab_3, icon3, QString());
         tab_4 = new QWidget();
         tab_4->setObjectName(QStringLiteral("tab_4"));
+        heatmap_view = new QGraphicsView(tab_4);
+        heatmap_view->setObjectName(QStringLiteral("heatmap_view"));
+        heatmap_view->setGeometry(QRect(0, 0, 781, 531));
         QIcon icon4;
         icon4.addFile(QStringLiteral(":/Tab_Icons/icons/heatmap.png"), QSize(), QIcon::Normal, QIcon::Off);
         tabWidget->addTab(tab_4, icon4, QString());
-        tab_5 = new QWidget();
-        tab_5->setObjectName(QStringLiteral("tab_5"));
+        Analyss_tab = new QWidget();
+        Analyss_tab->setObjectName(QStringLiteral("Analyss_tab"));
+        gridLayout_4 = new QGridLayout(Analyss_tab);
+        gridLayout_4->setSpacing(6);
+        gridLayout_4->setContentsMargins(11, 11, 11, 11);
+        gridLayout_4->setObjectName(QStringLiteral("gridLayout_4"));
+        analysis_grid = new QGridLayout();
+        analysis_grid->setSpacing(6);
+        analysis_grid->setObjectName(QStringLiteral("analysis_grid"));
+        people_view = new QGridLayout();
+        people_view->setSpacing(6);
+        people_view->setObjectName(QStringLiteral("people_view"));
+
+        analysis_grid->addLayout(people_view, 0, 0, 1, 1);
+
+
+        gridLayout_4->addLayout(analysis_grid, 0, 0, 1, 1);
+
         QIcon icon5;
         icon5.addFile(QStringLiteral(":/Tab_Icons/icons/analysis.png"), QSize(), QIcon::Normal, QIcon::Off);
-        tabWidget->addTab(tab_5, icon5, QString());
+        tabWidget->addTab(Analyss_tab, icon5, QString());
 
         gridLayout->addWidget(tabWidget, 0, 0, 1, 1);
 
@@ -345,7 +368,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        tabWidget->setCurrentIndex(0);
+        tabWidget->setCurrentIndex(4);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -363,7 +386,7 @@ public:
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("MainWindow", "Camera", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_3), QApplication::translate("MainWindow", "Global Tracking", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_4), QApplication::translate("MainWindow", "Heat Map", nullptr));
-        tabWidget->setTabText(tabWidget->indexOf(tab_5), QApplication::translate("MainWindow", "Analysis", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(Analyss_tab), QApplication::translate("MainWindow", "Analysis", nullptr));
     } // retranslateUi
 
 };

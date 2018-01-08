@@ -869,7 +869,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <property name="tabBarAutoHide">
        <bool>false</bool>
@@ -1062,8 +1062,18 @@
        <attribute name="title">
         <string>Heat Map</string>
        </attribute>
+       <widget class="QGraphicsView" name="heatmap_view">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>781</width>
+          <height>531</height>
+         </rect>
+        </property>
+       </widget>
       </widget>
-      <widget class="QWidget" name="tab_5">
+      <widget class="QWidget" name="Analyss_tab">
        <attribute name="icon">
         <iconset resource="resource.qrc">
          <normaloff>:/Tab_Icons/icons/analysis.png</normaloff>:/Tab_Icons/icons/analysis.png</iconset>
@@ -1071,6 +1081,15 @@
        <attribute name="title">
         <string>Analysis</string>
        </attribute>
+       <layout class="QGridLayout" name="gridLayout_4">
+        <item row="0" column="0">
+         <layout class="QGridLayout" name="analysis_grid">
+          <item row="0" column="0">
+           <layout class="QGridLayout" name="people_view"/>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>

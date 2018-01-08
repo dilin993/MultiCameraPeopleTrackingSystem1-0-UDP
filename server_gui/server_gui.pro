@@ -4,7 +4,9 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui\
+            charts
+
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -21,6 +23,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+QMAKE_CXXFLAGS += -std=c++11
 
 
 SOURCES += \
@@ -34,7 +37,8 @@ SOURCES += \
     FrameQueue.cpp \
     DataAssociation.cpp \
     CameraConfig.cpp \
-    ServerUDP.cpp
+    ServerUDP.cpp \
+    qcustomplot.cpp
 
 
 HEADERS += \
@@ -49,7 +53,8 @@ HEADERS += \
     Frame.h \
     DataAssociation.h \
     CameraConfig.h \
-    ServerUDP.h
+    ServerUDP.h \
+    qcustomplot.h
 
 LIBS += `pkg-config opencv --libs` \
         -lboost_system \

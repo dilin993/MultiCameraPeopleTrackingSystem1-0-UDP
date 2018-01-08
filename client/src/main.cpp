@@ -69,7 +69,7 @@ int main(int argc, const char *argv[])
                 detectorSource = config.child("detector").attribute("source").as_string();
                 BGS_TH = config.child("detector").attribute("bgs_th").as_int();
                 detector = new BGSDetector(BGS_TH,
-                                           BGS_MOVING_AVERAGE,
+                                           BGS_GMM,
                                            false,
                                            detectorSource,
                                            trainingMode);

@@ -3,14 +3,10 @@
 <configuration>
 
     <server ip="localhost" port="8080"/>
-<<<<<<< HEAD
+
     <video source="/dev/video0" width="320" height="240" fps="30"/>
     <camera id="0"/>
-    <detector source="/home/supuni/FYP/Qt app/MultiCameraPeopleTrackingSystem1-0-UDP/client/pca.xml" training="false" bgs_th="30"/>
-=======
-    <video source="/dev/video1" width="320" height="240" fps="30"/>
-    <camera id="1   "/>
-    <detector source="/home/dilin/fyp/MultiCameraPeopleTrackingSystem1-0-UDP/client/pca.xml" training="false" bgs_th="30"/>
->>>>>>> master
+    <detector source="/home/dilin/fyp/MultiCameraPeopleTrackingSystem1-0-UDP/client/pca.xml" training="False" bgs_th="30"/>
+
 
 </configuration>

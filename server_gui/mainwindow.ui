@@ -869,7 +869,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>4</number>
       </property>
       <property name="tabBarAutoHide">
        <bool>false</bool>
@@ -958,7 +958,7 @@
           <x>10</x>
           <y>10</y>
           <width>732</width>
-          <height>312</height>
+          <height>317</height>
          </rect>
         </property>
         <layout class="QGridLayout" name="gridLayout_2">

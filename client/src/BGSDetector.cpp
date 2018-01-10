@@ -134,7 +134,7 @@ std::vector<cv::Rect> BGSDetector::detect(cv::Mat &img)
 
     }
 
-    if(count<FRAME_WAIT+1)
+    if(method==BGS_HW && count<FRAME_WAIT+1)
     {
         count++;
         cout << "Training GMM: " << count << endl;

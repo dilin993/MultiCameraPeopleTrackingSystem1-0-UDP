@@ -36,7 +36,7 @@ public:
     void addNodes(uint8_t cameraID,std::vector<TrackedPoint> trackedPoints);
     std::vector<cv::Point2f> getUniquePoints();
     void clear();
-    std::vector<Mat> histograms;
+    std::vector<cv::Mat> histograms;
 
 private:
     std::vector<GraphNode> nodes;

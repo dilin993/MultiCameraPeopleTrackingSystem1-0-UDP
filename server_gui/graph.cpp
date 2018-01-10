@@ -44,7 +44,8 @@ void Graph::calculateCosts()
 
 cv::Mat Graph::combineHistograms(cv::Mat &hist1, cv::Mat &hist2)
 {
-    Mat hist = 0.5*hist1 + 0.5*hist2;
+    cv::Mat hist = 0.5*hist1 + 0.5*hist2;
+    return hist;
 }
 
 Graph::Graph(double DIST_TH)
@@ -90,7 +91,7 @@ std::vector<cv::Point2f> Graph::getUniquePoints()
             cv::Point2f p1 = nodes[minI].location;
             cv::Point2f p2 = nodes[minJ].location;
             uniquePoints.push_back(cv::Point2f((p1.x+p2.x)/2,(p1.y+p2.y)/2));
-            Mat histogram = combineHistograms(nodes[minI].histogram,
+            cv::Mat histogram = combineHistograms(nodes[minI].histogram,
                                               nodes[minJ].histogram);
             histograms.push_back(histogram);
             if(minI>minJ)

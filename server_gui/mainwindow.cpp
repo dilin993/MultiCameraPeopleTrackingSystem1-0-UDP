@@ -268,8 +268,13 @@ void MainWindow::doTracking()
     globalAssociation->assignTracks(uniquePoints,graph->histograms);
     vector<ParticleFilterTracker> &globalTracks = globalAssociation->getTracks();
 
+    vector<Point2f> trackedPoints;
+    for(auto tracker:globalTracks)
+    {
+        trackedPoints.push_back(tracker.getPos());
+    }
     updateScenes();
-    analysis( uniquePoints);
+    analysis( trackedPoints);
 
 }
 

@@ -2,9 +2,8 @@
 
 <configuration>
 
-    <main port="8080" num_nodes="1" width="320" height="240" dist_th="100"/>
+    <main port="8080" num_nodes="2" width="320" height="240" dist_th="100"/>
 
-    <camera0 config="/home/dilin/fyp/MultiCameraPeopleTrackingSystem1-0-UDP/server_gui/configuration/camera-c0-config.xml"/>
- <!--    <camera1 config="/home/dilin/fyp/MultiCameraPeopleTrackingSystem1-0-UDP/server_gui/configuration/camera-c1-config.xml"/>
- -->
+    <camera0 config="/home/fyp-zc702/FYP/MultiCameraPeopleTrackingSystem1-0-UDP/server_gui/configuration/camera-c0-config.xml"/>
+    <camera1 config="/home/fyp-zc702/FYP/MultiCameraPeopleTrackingSystem1-0-UDP/server_gui/configuration/camera-c1-config.xml"/>
 </configuration>

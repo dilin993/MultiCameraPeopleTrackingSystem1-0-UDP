@@ -9,8 +9,8 @@
 #include <math.h>
 #include <cmath>
 
-#define IMG_H 288
-#define IMG_W 360
+#define IMG_H 240
+#define IMG_W 320
 #define IMG_SIZE IMG_W*IMG_H
 #define MODELS 2
 #define PARTS 128

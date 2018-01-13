@@ -4,7 +4,7 @@
 
     <server ip="localhost" port="8080"/>
 
-    <video source="/home/dilin/Videos/people_videos/terrace1-c0.avi" width="360" height="288" fps="1000"/>
+    <video source="/home/dilin/Videos/Webcam/output3.avi" width="320" height="240" fps="30"/>
     <camera id="0"/>
     <detector source="/home/dilin/fyp/MultiCameraPeopleTrackingSystem1-0-UDP/client/pca.xml" training="false" bgs_th="30"/>
 

@@ -5,7 +5,7 @@
     <server ip="localhost" port="8080"/>
     <video source="/dev/video0" width="320" height="240" fps="30"/>
     <camera id="0"/>
-    <detector source="/home/fyp-zc702/FYP/MultiCameraPeopleTrackingSystem1-0-UDP/client/pca.xml" training="false" bgs_th="30"/>
+    <detector source="/home/dilin/fyp/MultiCameraPeopleTrackingSystem1-0-UDP/client/pca.xmll" training="false" bgs_th="30"/>
 
 
 </configuration>

@@ -20,7 +20,7 @@
 #include "FrameQueue.h"
 #include<fstream>
 
-#define BUFFER_SIZE 32768
+#define BUFFER_SIZE 49152
 
 using namespace std;
 using namespace cv;

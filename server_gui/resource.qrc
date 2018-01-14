@@ -8,5 +8,7 @@
         <file>icons/tracking.png</file>
         <file>icons/server.jpeg</file>
     </qresource>
-    <qresource prefix="/"/>
+    <qresource prefix="/">
+        <file>images/map.png</file>
+    </qresource>
 </RCC>

@@ -102,6 +102,8 @@ void MainWindow::loadSettings()
     {
         ui->txtConfigFile->setText(configFile);
     }
+
+    floormap = imread(":/images/map.png");
 }
 
 void MainWindow::saveSettings()
@@ -214,6 +216,10 @@ void MainWindow::doTracking()
         histograms.clear();
         k = 0;
         imgs[n] = Mat::zeros(HEIGHT,WIDTH,CV_8UC3);
+        Mat mask;
+        frame.getMask(mask);
+        applyColorMap(mask,imgs[n],COLORMAP_JET);
+
         for (auto const bbox : frame.detections)
         {
             Rect detection(bbox.x, bbox.y, bbox.width, bbox.height);
@@ -275,6 +281,7 @@ void MainWindow::doTracking()
     }
     updateScenes();
     analysis( trackedPoints);
+    update_globalTracks(trackedPoints);
 
 }
 
@@ -380,13 +387,11 @@ void MainWindow::analysis( vector<Point2f> uniquePoints)
 //    ui->textEdit->append(QTime::currentTime().toString());
 }
 
-void MainWindow::update_globalTrack(int x, int y){
+void MainWindow::update_globalTracks(vector<Point2f> &trackedPoints)
+{
 //    cv::Mat image;
     cv::Mat temp;
     floormap.copyTo(temp);
-    //image = cv::imread("/home/FYP/QtApp/floormap.png", CV_LOAD_IMAGE_COLOR);
-//    cv::cvtColor(image, temp, CV_BGR2RGB);
-    cv::drawMarker(temp,cv::Point(x,y),0xff0000,cv::MARKER_CROSS,1,5,8);
 
     QImage qImage((const uchar *) temp.data, temp.cols, temp.rows, temp.step, QImage::Format_RGB888);
     qImage.bits();

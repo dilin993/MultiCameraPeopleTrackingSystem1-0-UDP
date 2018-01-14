@@ -30,6 +30,8 @@ std::vector<cv::Rect> BGSDetector::detect(cv::Mat &img)
         if(frameCount<3)
         {
             frameCount++;
+            if(!mask.data)
+                mask = Mat::zeros(img.rows,img.cols,CV_8UC1);
             return detections;
         }
 

@@ -54,13 +54,13 @@ public:
     vector<DetectionRecord> data;
     void trainDetector();
     int method;
+    cv::Mat mask;
 
 private:
     void backgroundSubstraction(cv::Mat &frame0, cv::Mat &frame1, cv::Mat &frame2
             , cv::Mat &bgModel, cv::Mat &mask, double TH=15);
     cv::Mat frames[3];
     cv::Mat bgModel;
-    cv::Mat mask;
     uint8_t frameCount;
     double TH;
     cv::Ptr<cv::BackgroundSubtractor> pMOG2; //MOG2 Background subtractor

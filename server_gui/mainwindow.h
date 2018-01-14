@@ -46,7 +46,7 @@ private slots:
     void doTracking();
 
     //heatmap and global tracking
-    void update_globalTrack(int x, int y);
+    void update_globalTracks(vector<Point2f> &trackedPoints);
     void update_heatmap(int x, int y);
     void analysis( vector<Point2f> uniquePoints);
 

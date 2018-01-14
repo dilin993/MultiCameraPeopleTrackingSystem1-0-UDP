@@ -18,7 +18,7 @@
 #include <boost/serialization/vector.hpp>
 #include "Frame.h"
 
-#define BUFFER_SIZE 32768
+#define BUFFER_SIZE 49152
 
 using namespace std;
 using namespace cv;

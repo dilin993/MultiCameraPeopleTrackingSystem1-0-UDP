@@ -87,8 +87,8 @@ int main(int argc, const char *argv[])
     uint8_t cameraID = 0;
     int WIDTH, HEIGHT, FPS, BGS_TH;
 
-    try
-    {
+//    try
+//    {
         if (argc > 1)
         {
             pugi::xml_document doc;
@@ -107,7 +107,7 @@ int main(int argc, const char *argv[])
                 detectorSource = config.child("detector").attribute("source").as_string();
                 BGS_TH = config.child("detector").attribute("bgs_th").as_int();
                 detector = new BGSDetector(BGS_TH,
-                                           BGS_MOVING_AVERAGE,
+                                           BGS_GMM,
                                            false,
                                            detectorSource,
                                            trainingMode);
@@ -159,18 +159,21 @@ int main(int argc, const char *argv[])
                 break;
             }
 
-            cvtColor(img,gray, CV_BGR2GRAY);
 
-            memcpy(data_array, gray.data, IMG_SIZE);
-
-            execute(data_array,mask, init);
-
-            if(init) init = false;
 
             vector<Rect> detections;
 
             if(detector->method==BGS_HW)
+            {
+                cvtColor(img, gray, CV_BGR2GRAY);
+
+                memcpy(data_array, gray.data, IMG_SIZE);
+
+                execute(data_array, mask, init);
+
+                if (init) init = false;
                 detections = detector->detect(mask);
+            }
             else
                 detections = detector->detect(img);
 
@@ -197,6 +200,7 @@ int main(int argc, const char *argv[])
                     frame.histograms.push_back(histogram);
                 }
                 frameNo++;
+                frame.setMask(detector->mask);
                 frame.set_now();
                 client->send(frame);
             }
@@ -216,11 +220,11 @@ int main(int argc, const char *argv[])
 #endif
 
         }
-    }
-    catch (exception e)
-    {
-        cerr << "Error: " << e.what() << endl;
-    }
+//    }
+//    catch (exception e)
+//    {
+//        cerr << "Error: " << e.what() << endl;
+//    }
 
 
     signalHandler(0);

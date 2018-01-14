@@ -20,6 +20,7 @@
 #include <QtCharts/QLineSeries>
 #include <QTime>
 #include <qcustomplot.h>
+#include <QFile>
 
 QT_CHARTS_USE_NAMESPACE
 
@@ -46,7 +47,7 @@ private slots:
     void doTracking();
 
     //heatmap and global tracking
-    void update_globalTracks(vector<Point2f> &trackedPoints);
+    void update_globalTracks(vector<Point2f> &trackedPoints,vector<Scalar> &colors);
     void update_heatmap(int x, int y);
     void analysis( vector<Point2f> uniquePoints);
 
@@ -110,6 +111,8 @@ private:
 
     cv::Mat map;
     cv::Mat pallete;
+
+    cv::Mat loadFromQrc(QString qrc, int flag = IMREAD_COLOR);
 
 
 };

@@ -40,7 +40,8 @@ int main(int argc,const char * argv[])
         return -1;
     }
 
-    img = imread(argv[1]);
+    VideoCapture cap(argv[1]);
+    cap.read(img);
     namedWindow(W_TITLE);
 
     setMouseCallback(W_TITLE, mouse_callback);

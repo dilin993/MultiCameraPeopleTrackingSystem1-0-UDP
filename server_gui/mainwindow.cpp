@@ -15,7 +15,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(doTracking()));
-    connect(timer, SIGNAL(timeout()), this, SLOT( analysis( vector<Point2f> uniquePoints)));
 
     camScenes[0] = new QGraphicsScene(this);
     ui->gvCam1->setScene(camScenes[0]);
@@ -73,6 +72,14 @@ MainWindow::MainWindow(QWidget *parent) :
     //QTimer *timer = new QTimer(this);
 
     //timer->start( timeInterval );
+//    imageScene = new QGraphicsScene(this);
+    globalScene = new QGraphicsScene(this);
+    heatmapScene = new QGraphicsScene(this);
+
+   /* ui->graphicsView->setScene(imageScene)*/;
+    ui->glob_track_view->setScene(globalScene);
+    ui->heatmap_view->setScene(heatmapScene);
+
 
 }
 
@@ -103,7 +110,7 @@ void MainWindow::loadSettings()
         ui->txtConfigFile->setText(configFile);
     }
 
-    floormap = imread(":/images/map.png");
+    floormap = loadFromQrc(":/images/map.png");
 }
 
 void MainWindow::saveSettings()
@@ -147,6 +154,21 @@ void MainWindow::updateScenes()
     }
     ui->gvCam1->update();
     ui->gvCam2->update();
+}
+
+Mat MainWindow::loadFromQrc(QString qrc, int flag)
+{
+    QFile file(qrc);
+    cv::Mat m;
+    if(file.open(QIODevice::ReadOnly))
+    {
+        qint64 sz = file.size();
+        std::vector<uchar> buf(sz);
+        file.read((char*)buf.data(), sz);
+        m = imdecode(buf, flag);
+    }
+
+    return m;
 }
 
 void MainWindow::on_txtConfigFile_textChanged(const QString &arg1)
@@ -275,13 +297,15 @@ void MainWindow::doTracking()
     vector<ParticleFilterTracker> &globalTracks = globalAssociation->getTracks();
 
     vector<Point2f> trackedPoints;
+    vector<Scalar> colors;
     for(auto tracker:globalTracks)
     {
         trackedPoints.push_back(tracker.getPos());
+        colors.push_back(tracker.color);
     }
     updateScenes();
     analysis( trackedPoints);
-    update_globalTracks(trackedPoints);
+    update_globalTracks(uniquePoints,colors);
 
 }
 
@@ -387,11 +411,21 @@ void MainWindow::analysis( vector<Point2f> uniquePoints)
 //    ui->textEdit->append(QTime::currentTime().toString());
 }
 
-void MainWindow::update_globalTracks(vector<Point2f> &trackedPoints)
+void MainWindow::update_globalTracks(vector<Point2f> &trackedPoints,vector<Scalar> &colors)
 {
 //    cv::Mat image;
     cv::Mat temp;
     floormap.copyTo(temp);
+
+    for(int j=0;j<trackedPoints.size();j++)
+    {
+        Point2f pos(trackedPoints[j].x+300,
+                    trackedPoints[j].y+300);
+        drawMarker(temp, pos,
+                   Scalar(0,0,0),//colors[j],
+                   MarkerTypes::MARKER_CROSS, 20, 5);
+
+    }
 
     QImage qImage((const uchar *) temp.data, temp.cols, temp.rows, temp.step, QImage::Format_RGB888);
     qImage.bits();

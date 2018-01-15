@@ -48,7 +48,7 @@ private slots:
 
     //heatmap and global tracking
     void update_globalTracks(vector<Point2f> &trackedPoints,vector<Scalar> &colors);
-    void update_heatmap(int x, int y);
+    void update_heatmap(vector<Point2f> &trackedPoints);
     void analysis( vector<Point2f> uniquePoints);
 
 
@@ -104,8 +104,10 @@ private:
     QGraphicsScene *imageScene;
     QGraphicsScene *globalScene;
     QGraphicsScene *heatmapScene;
+    QGraphicsScene *overlayScene;
 
     cv::Mat floormap;
+    cv::Mat colourMap;
 
     int count;
 

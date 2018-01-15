@@ -869,7 +869,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>3</number>
       </property>
       <property name="tabBarAutoHide">
        <bool>false</bool>
@@ -1057,6 +1057,16 @@
        <attribute name="title">
         <string>Heat Map</string>
        </attribute>
+       <widget class="QGraphicsView" name="overlayView">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>781</width>
+          <height>531</height>
+         </rect>
+        </property>
+       </widget>
        <widget class="QGraphicsView" name="heatmap_view">
         <property name="geometry">
          <rect>

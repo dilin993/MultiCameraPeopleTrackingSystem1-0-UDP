@@ -76,9 +76,12 @@ MainWindow::MainWindow(QWidget *parent) :
     globalScene = new QGraphicsScene(this);
     heatmapScene = new QGraphicsScene(this);
 
-   /* ui->graphicsView->setScene(imageScene)*/;
+   /* ui->graphicsView->setScene(imageScene)*/
+    ui->heatmap_view->setStyleSheet("background: transparent");
     ui->glob_track_view->setScene(globalScene);
     ui->heatmap_view->setScene(heatmapScene);
+
+
 
 
 }
@@ -111,6 +114,22 @@ void MainWindow::loadSettings()
     }
 
     floormap = loadFromQrc(":/images/floormap.png");
+    map = Mat::zeros(266,345,CV_8UC1);
+    pallete = loadFromQrc(":/images/pallete.jpg");
+    colourMap = cv::Mat::zeros(266,345,CV_8UC4);
+    count = 0;
+    overlayScene = new QGraphicsScene(this);
+    ui->overlayView->setStyleSheet("background: transparent");
+    ui->overlayView->setScene(overlayScene);
+
+    QImage qImage((const uchar *) floormap.data, floormap.cols, floormap.rows, floormap.step, QImage::Format_RGB888);
+    qImage.bits();
+
+    overlayScene->clear();
+
+    overlayScene->addPixmap(QPixmap::fromImage(qImage));
+    overlayScene->update();
+    ui->overlayView->update();
 }
 
 void MainWindow::saveSettings()
@@ -424,46 +443,54 @@ void MainWindow::update_globalTracks(vector<TrackedPoint> &trackedPoints)
     ui->glob_track_view->update();
 }
 
-void MainWindow::update_heatmap(int x, int y){
+void MainWindow::update_heatmap(vector<Point2f> &trackedPoints){
 
-    int val = pallete.at<cv::Vec3b>(0,0)[1];
-    cv::Mat colourMap = cv::Mat::zeros(1177,682,CV_8UC3);
-    for (int i=0;i<1177;i++){
-        for (int j=0;j<682;j++){
-            uint8_t temp = (map.at<uint8_t>(i,j)*count)/255;
-            if (i>=y-5 && i<=y+5 && j>=x-5 &&j<=x+5){
-                map.at<uint8_t>(i,j) = (temp+25)*255/(count+1);
-                if (map.at<uint8_t>(i,j)==0){
-                   colourMap.at<cv::Vec3b>(i,j)={0,0,0};
-                }
-                else{
-                    colourMap.at<cv::Vec3b>(i,j) = pallete.at<cv::Vec3b>(map.at<uint8_t>(i,j),1);
-                }
+    //cv::Mat colourMap = cv::Mat::zeros(266,345,CV_8UC3);
+
+    for(int k=0;k<trackedPoints.size();k++){
+        int x = trackedPoints[k].x;
+        int y = trackedPoints[k].y;
+        //int val = pallete.at<cv::Vec3b>(0,0)[1];
+
+        for (int i=0;i<266;i++){
+            for (int j=0;j<345;j++){
+                uint8_t temp = (map.at<uint8_t>(i,j)*count)/255;
+                if (i>=y-5 && i<=y+5 && j>=x-5 &&j<=x+5){
+                    map.at<uint8_t>(i,j) = (temp+25)*255/(count+1);
+                    if (map.at<uint8_t>(i,j)==0){
+                        colourMap.at<cv::Vec4b>(i,j)={0,0,0,0};
+                    }
+                    else{
+                        cv::Vec3b val = pallete.at<cv::Vec3b>(map.at<uint8_t>(i,j),1);
+                        colourMap.at<cv::Vec4b>(i,j) = {val[0],val[1],val[2],255};
+                    }
 //                map.at<uint8_t>(i,j)+=255;
-            }
-            else{
-                map.at<uint8_t>(i,j) = (temp)*255/(count+1);
-                if (map.at<uint8_t>(i,j)==0){
-                    colourMap.at<cv::Vec3b>(i,j)={0,0,0};
                 }
                 else{
-                    colourMap.at<cv::Vec3b>(i,j) = pallete.at<cv::Vec3b>(map.at<uint8_t>(i,j),1);
+                    map.at<uint8_t>(i,j) = (temp)*255/(count+1);
+                    if (map.at<uint8_t>(i,j)==0){
+                        colourMap.at<cv::Vec4b>(i,j)={0,0,0,0};
+                    }
+                    else{
+                        cv::Vec3b val = pallete.at<cv::Vec3b>(map.at<uint8_t>(i,j),1);
+                        colourMap.at<cv::Vec4b>(i,j) = {val[0],val[1],val[2],255};
+                    }
                 }
             }
         }
+
+
+        count+=1;
     }
-
-
-
-
-
-    count+=1;
 
 //    cv::Mat colourMap;
 //    cv::applyColorMap(map,colourMap,cv::COLORMAP_JET);
-    cv::cvtColor(colourMap,colourMap,CV_BGR2RGB);
+    cv::cvtColor(colourMap,colourMap,CV_BGRA2RGBA);
+    //addWeighted(colourMap,0.9,floormap,0.1,0.0,colourMap);
     //colourMap = floormap + colourMap;
-    QImage qImage((const uchar *) colourMap.data, colourMap.cols, colourMap.rows, colourMap.step, QImage::Format_RGB888);
+    //colourMap = cv::Mat::ones(266,345,CV_8UC3);
+
+    QImage qImage((const uchar *) colourMap.data, colourMap.cols, colourMap.rows, colourMap.step, QImage::Format_RGBA8888);
     qImage.bits();
 
     heatmapScene->clear();

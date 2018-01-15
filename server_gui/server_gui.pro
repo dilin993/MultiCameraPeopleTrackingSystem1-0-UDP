@@ -33,12 +33,12 @@ SOURCES += \
     pugixml.cpp \
     ParticleFilterTracker.cpp \
     hungarian.cpp \
-    graph.cpp \
     FrameQueue.cpp \
     DataAssociation.cpp \
     CameraConfig.cpp \
     ServerUDP.cpp \
-    qcustomplot.cpp
+    qcustomplot.cpp \
+    Graph.cpp
 
 
 HEADERS += \
@@ -48,13 +48,13 @@ HEADERS += \
     pugiconfig.hpp \
     ParticleFilterTracker.h \
     hungarian.h \
-    graph.h \
     FrameQueue.h \
     Frame.h \
     DataAssociation.h \
     CameraConfig.h \
     ServerUDP.h \
-    qcustomplot.h
+    qcustomplot.h \
+    Graph.h
 
 LIBS += `pkg-config opencv --libs` \
         -lboost_system \

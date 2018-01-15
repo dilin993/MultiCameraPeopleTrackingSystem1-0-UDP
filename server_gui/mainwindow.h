@@ -11,7 +11,7 @@
 #include <thread>
 #include "pugixml.hpp"
 #include "DataAssociation.h"
-#include "graph.h"
+#include "Graph.h"
 #include "CameraConfig.h"
 #include "serverthread.h"
 #include <QtWidgets/QApplication>
@@ -47,9 +47,9 @@ private slots:
     void doTracking();
 
     //heatmap and global tracking
-    void update_globalTracks(vector<Point2f> &trackedPoints,vector<Scalar> &colors);
+    void update_globalTracks(vector<TrackedPoint> &trackedPoints);
     void update_heatmap(int x, int y);
-    void analysis( vector<Point2f> uniquePoints);
+    void analysis(vector<TrackedPoint> &trackedPoints);
 
 
 private:
@@ -98,7 +98,6 @@ private:
 
     // Global Tracking
     Graph* graph;
-    DataAssociation* globalAssociation;
 
     //Heatmap and Global Tracking View
     QGraphicsScene *imageScene;

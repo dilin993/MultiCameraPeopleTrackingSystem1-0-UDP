@@ -1,0 +1,3 @@
+/home/MultiCameraPeopleTrackingSystem1-0-UDP/caliberation_test/CMakeFiles/rebuild_cache.dir
+/home/MultiCameraPeopleTrackingSystem1-0-UDP/caliberation_test/CMakeFiles/calibrate.dir
+/home/MultiCameraPeopleTrackingSystem1-0-UDP/caliberation_test/CMakeFiles/edit_cache.dir

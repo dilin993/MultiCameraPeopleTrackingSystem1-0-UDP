@@ -110,7 +110,7 @@ void MainWindow::loadSettings()
         ui->txtConfigFile->setText(configFile);
     }
 
-    floormap = loadFromQrc(":/images/map.png");
+    floormap = loadFromQrc(":/images/floormap.png");
 }
 
 void MainWindow::saveSettings()
@@ -419,11 +419,11 @@ void MainWindow::update_globalTracks(vector<Point2f> &trackedPoints,vector<Scala
 
     for(int j=0;j<trackedPoints.size();j++)
     {
-        Point2f pos(trackedPoints[j].x+300,
-                    trackedPoints[j].y+300);
+        Point2f pos(trackedPoints[j].x,
+                    trackedPoints[j].y);
         drawMarker(temp, pos,
                    Scalar(0,0,0),//colors[j],
-                   MarkerTypes::MARKER_CROSS, 20, 5);
+                   MarkerTypes::MARKER_CROSS, 5, 5);
 
     }
 

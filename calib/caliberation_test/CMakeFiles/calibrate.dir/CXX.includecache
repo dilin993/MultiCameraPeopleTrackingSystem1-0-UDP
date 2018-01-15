@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/MultiCameraPeopleTrackingSystem1-0-UDP/caliberation_test/src/main.cpp
+iostream
+-
+vector
+-
+opencv2/opencv.hpp
+-
+

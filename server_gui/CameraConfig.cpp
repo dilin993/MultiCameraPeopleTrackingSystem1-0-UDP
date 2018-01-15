@@ -42,6 +42,7 @@ void CameraConfig::load(string configFilePath)
             for(int j=0;j<3;j++)
             {
                 H.at<float>(i,j) = stof(strs[i*3+j]);
+
             }
         }
     }

@@ -110,7 +110,7 @@ void MainWindow::loadSettings()
         ui->txtConfigFile->setText(configFile);
     }
 
-    floormap = loadFromQrc(":/images/map.png");
+    floormap = loadFromQrc(":/images/floormap.png");
 }
 
 void MainWindow::saveSettings()

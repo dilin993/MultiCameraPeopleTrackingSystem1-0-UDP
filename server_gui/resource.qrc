@@ -10,5 +10,6 @@
     </qresource>
     <qresource prefix="/">
         <file>images/map.png</file>
+        <file>images/floormap.png</file>
     </qresource>
 </RCC>

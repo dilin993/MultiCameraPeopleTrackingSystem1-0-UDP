@@ -228,8 +228,6 @@ void MainWindow::on_btnStartServer_clicked()
                                             WIDTH,HEIGHT));
             imgs.push_back(Mat::zeros(HEIGHT,WIDTH,CV_8UC3));
         }
-
-        globalAssociation = new DataAssociation(0.8,200,320,240); // TODO: Update parameters
         ui->txtConsole->appendPlainText(tr("Configuration loaded.\n"));
         ui->btnStartServer->setEnabled(false);
         serverThread = new ServerThread(frames,PORT);
@@ -303,33 +301,22 @@ void MainWindow::doTracking()
         {
             Point2f pos = tracks[j].getPos();
             pos = cameraConfigs[i].convertToGround(pos);
-            groundPlanePoints.push_back(TrackedPoint(tracks[j].histogram,
+            groundPlanePoints.push_back(TrackedPoint((uint8_t)i,
+                                                     tracks[j].histogram,
                                                      pos,
                                                      tracks[j].color));
         }
         // do correspondence estimation
-        graph->addNodes((uint8_t)i,groundPlanePoints);
+        graph->addNodes(groundPlanePoints);
     }
 
-    vector<Point2f> uniquePoints = graph->getUniquePoints();
-    globalAssociation->assignTracks(uniquePoints,graph->histograms);
-    vector<ParticleFilterTracker> &globalTracks = globalAssociation->getTracks();
-
-    vector<Point2f> trackedPoints;
-    vector<Scalar> colors;
-    for(auto tracker:globalTracks)
-    {
-        trackedPoints.push_back(tracker.getPos());
-        colors.push_back(tracker.color);
-    }
+    vector<TrackedPoint> trackedPoints = graph->getUniquePoints();
     updateScenes();
-    analysis(trackedPoints);
-    update_globalTracks(uniquePoints,colors);
-    update_heatmap(uniquePoints);
-
+    analysis( trackedPoints);
+    update_globalTracks(trackedPoints);
 }
 
-void MainWindow::analysis( vector<Point2f> uniquePoints)
+void MainWindow::analysis(vector<TrackedPoint> &trackedPoints)
 {
     // Get the current time
     QTime tm = QTime::currentTime();
@@ -344,7 +331,7 @@ void MainWindow::analysis( vector<Point2f> uniquePoints)
     qreal r = static_cast<qreal>( rand() ) / RAND_MAX  ;
     // the next value will be 80 plus or minus 5
     qreal value = 80 + 5 * r;
-    m_YData.append( uniquePoints.size());
+    m_YData.append( trackedPoints.size());
 
     // Keep the data buffers size under 100 value each,
     // so our moemoty won't explode with random numbers
@@ -431,7 +418,7 @@ void MainWindow::analysis( vector<Point2f> uniquePoints)
 //    ui->textEdit->append(QTime::currentTime().toString());
 }
 
-void MainWindow::update_globalTracks(vector<Point2f> &trackedPoints,vector<Scalar> &colors)
+void MainWindow::update_globalTracks(vector<TrackedPoint> &trackedPoints)
 {
 //    cv::Mat image;
     cv::Mat temp;
@@ -439,11 +426,10 @@ void MainWindow::update_globalTracks(vector<Point2f> &trackedPoints,vector<Scala
 
     for(int j=0;j<trackedPoints.size();j++)
     {
-        Point2f pos(trackedPoints[j].x,
-                    trackedPoints[j].y);
-        drawMarker(temp, pos,
-                   Scalar(0,0,0),//colors[j],
-                   MarkerTypes::MARKER_CROSS, 5, 5);
+        drawMarker(temp,
+                   trackedPoints[j].location,
+                   trackedPoints[j].color,//colors[j],
+                   MarkerTypes::MARKER_SQUARE, 20, 5);
 
     }
 

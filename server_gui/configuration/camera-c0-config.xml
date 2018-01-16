@@ -2,7 +2,7 @@
 
 <configuration>
     <camera id="0"/>
-    <track TRACK_INIT_TH="0.8" REJ_TOL="150"/>
+    <track TRACK_INIT_TH="0.9" REJ_TOL="150"/>
     <homography mat=
                         " 2.0136773586273193e-01, 1.4190829992294312e+00, 2.9019361495971680e+01,
     -3.8653552532196045e-01, 4.9067619442939758e-01,

@@ -21,6 +21,7 @@
 #include <QTime>
 #include <qcustomplot.h>
 #include <QFile>
+#include "udp_client.h"
 
 QT_CHARTS_USE_NAMESPACE
 
@@ -114,6 +115,12 @@ private:
     cv::Mat pallete;
 
     cv::Mat loadFromQrc(QString qrc, int flag = IMREAD_COLOR);
+
+    // WEB APP Communication
+    int PORT_WEB_APP;
+    string IP_WEB_APP;
+    udp_client::udp_client *client_web_app;
+    void update_web_app(vector<TrackedPoint> &trackedPoints);
 
 
 };

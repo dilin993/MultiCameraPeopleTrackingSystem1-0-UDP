@@ -3,6 +3,7 @@
 <configuration>
 
     <main port="8080" num_nodes="1" width="320" height="240" dist_th="100"/>
+    <web ip="127.0.0.1" port="8090"/>
 
     <camera0 config="/home/dilin/fyp/MultiCameraPeopleTrackingSystem1-0-UDP/server_gui/configuration/camera-c0-config.xml"/>
     

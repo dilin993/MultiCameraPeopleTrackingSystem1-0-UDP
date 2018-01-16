@@ -10,7 +10,6 @@
 #include<iostream>
 #include <opencv2/opencv.hpp>
 #include "hungarian.h"
-#include <fstream>
 #include <boost/date_time/posix_time/posix_time.hpp>
 typedef boost::posix_time::ptime Time;
 typedef boost::posix_time::time_duration TimeDuration;
@@ -19,6 +18,8 @@ typedef boost::posix_time::time_duration TimeDuration;
 
 using namespace std;
 using  namespace cv;
+
+#define NO_TRACK_OFFSET 10
 
 
 
@@ -44,8 +45,8 @@ private:
     double sigma_propagate[NUM_STATES]={5.0, 5.0, 1.0, 1.0};
     double var_m=0.5;
     double alpha = 0.5;
-    ofstream dataFile;
     Time timeStamp;
+    Rect TRACK_REGION;
 };
 
 

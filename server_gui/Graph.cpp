@@ -12,6 +12,16 @@ TrackedPoint::TrackedPoint(uint8_t cameraID,
 
 }
 
+void TrackedPoint::setTimeStamp(Time timeStamp)
+{
+    this->timeStamp = timeStamp;
+}
+
+const Time TrackedPoint::getTimeStamp()
+{
+    return timeStamp;
+}
+
 Graph::Graph(double DIST_TH):
     DIST_TH(DIST_TH)
 {

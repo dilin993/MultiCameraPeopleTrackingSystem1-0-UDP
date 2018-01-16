@@ -80,10 +80,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->heatmap_view->setStyleSheet("background: transparent");
     ui->glob_track_view->setScene(globalScene);
     ui->heatmap_view->setScene(heatmapScene);
-
-
-
-
 }
 
 MainWindow::~MainWindow()
@@ -190,6 +186,31 @@ Mat MainWindow::loadFromQrc(QString qrc, int flag)
     return m;
 }
 
+void MainWindow::update_web_app(vector<TrackedPoint> &trackedPoints)
+{
+    string json = "{\n\t\"detections\":[";
+    int n=0;
+    for(auto trackedPoint:trackedPoints)
+    {
+        json += "[";
+        json += to_string(trackedPoint.location.x) + ",";
+        json += to_string(trackedPoint.location.y) + ",";
+        json += to_string((int)trackedPoint.color[0]) + ",";
+        json += to_string((int)trackedPoint.color[1]) + ",";
+        json += to_string((int)trackedPoint.color[2]);
+        json += "]";
+        n++;
+        if(n!=trackedPoints.size())
+            json += ",";
+    }
+    json += "]\n\ttimestamp:";
+    if(trackedPoints.size())
+        json += to_simple_string(trackedPoints[0].getTimeStamp());
+
+    json += "\n}";
+    client_web_app->send(json.c_str(),json.length());
+}
+
 void MainWindow::on_txtConfigFile_textChanged(const QString &arg1)
 {
     if(fileExists(arg1))
@@ -207,11 +228,15 @@ void MainWindow::on_btnStartServer_clicked()
         pugi::xml_node config = doc.child("configuration");
         NUM_NODES = (unsigned short)config.child("main").attribute("num_nodes").as_int();
         PORT = (unsigned short)config.child("main").attribute("port").as_int();
+        PORT_WEB_APP = config.child("web").attribute("port").as_int();
+        IP_WEB_APP = config.child("web").attribute("ip").as_string();
         WIDTH = (unsigned short)config.child("main").attribute("width").as_int();
         HEIGHT = (unsigned short)config.child("main").attribute("height").as_int();
         DIST_TH = config.child("main").attribute("dist_th").as_double();
 
         graph = new Graph(DIST_TH);
+        client_web_app = new udp_client::udp_client(IP_WEB_APP,
+                                                    PORT_WEB_APP);
 
         for(unsigned short n=0;n<NUM_NODES;n++)
         {
@@ -287,7 +312,7 @@ void MainWindow::doTracking()
             Point2f pos = tracks[i].getPos();
             drawMarker(imgs[n], pos,
                        tracks[i].color,
-                       MarkerTypes::MARKER_CROSS, 20, 5);
+                       MarkerTypes::MARKER_CROSS, 10, 3);
 
         }
     }
@@ -305,6 +330,7 @@ void MainWindow::doTracking()
                                                      tracks[j].histogram,
                                                      pos,
                                                      tracks[j].color));
+            groundPlanePoints[i].setTimeStamp(associations[i]->getTimeStamp());
         }
         // do correspondence estimation
         graph->addNodes(groundPlanePoints);
@@ -314,6 +340,9 @@ void MainWindow::doTracking()
     updateScenes();
     analysis( trackedPoints);
     update_globalTracks(trackedPoints);
+
+    if(trackedPoints.size())
+        update_web_app(trackedPoints);
 }
 
 void MainWindow::analysis(vector<TrackedPoint> &trackedPoints)
@@ -429,7 +458,7 @@ void MainWindow::update_globalTracks(vector<TrackedPoint> &trackedPoints)
         drawMarker(temp,
                    trackedPoints[j].location,
                    trackedPoints[j].color,//colors[j],
-                   MarkerTypes::MARKER_SQUARE, 20, 5);
+                   MarkerTypes::MARKER_SQUARE, 7, 2);
 
     }
 

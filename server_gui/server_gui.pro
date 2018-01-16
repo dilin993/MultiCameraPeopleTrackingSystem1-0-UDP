@@ -38,7 +38,8 @@ SOURCES += \
     CameraConfig.cpp \
     ServerUDP.cpp \
     qcustomplot.cpp \
-    Graph.cpp
+    Graph.cpp \
+    udp_client.cpp
 
 
 HEADERS += \
@@ -54,7 +55,8 @@ HEADERS += \
     CameraConfig.h \
     ServerUDP.h \
     qcustomplot.h \
-    Graph.h
+    Graph.h \
+    udp_client.h
 
 LIBS += `pkg-config opencv --libs` \
         -lboost_system \

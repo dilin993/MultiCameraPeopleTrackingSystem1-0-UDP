@@ -10,9 +10,11 @@ DataAssociation::DataAssociation(double TRACK_INIT_TH,int REJ_TOL,
         REJ_TOL(REJ_TOL),
         WIDTH(WIDTH),
         HEIGHT(HEIGHT),
-        dataFile("../data.csv")
+        TRACK_REGION(NO_TRACK_OFFSET,
+                     NO_TRACK_OFFSET,
+                     WIDTH - NO_TRACK_OFFSET,
+                     HEIGHT - NO_TRACK_OFFSET)
 {
-
 }
 
 
@@ -33,6 +35,9 @@ void DataAssociation::assignTracks(vector<Point2f> detections,
 
     for(int i=0;i<detections.size();i++)
     {
+        if(!TRACK_REGION.contains(detections[i])) // Reject detections outside tracking region
+            continue;
+
         if(tracks.size()==0) // initialize the first track
         {
             tracks.emplace_back(detections[i],histograms[i],
@@ -53,7 +58,6 @@ void DataAssociation::assignTracks(vector<Point2f> detections,
                 row.push_back(e);
             }
             cout << "min_e = " << min_e << endl;
-            dataFile << min_e << endl;
             if (min_e > TRACK_INIT_TH) // initialize new track
             {
                 ParticleFilterTracker tr(detections[i],histograms[i],
@@ -134,10 +138,6 @@ double DataAssociation::averageError(Point2f a, Point2f b)
 
 double DataAssociation::averageError(Point2f a, Point2f b, MatND histA, MatND histB)
 {
-//    double dh = compareHist(histA,histB,HISTCMP_BHATTACHARYYA);
-//    dh = 20.0 * (1 - dh);
-//    double e = dh + averageError(a,b);
-//    return  e;
 
     double constGaus = 1.0/sqrt(2*M_PI*var_m);
     double dist = pow(a.x-b.x,2.0);

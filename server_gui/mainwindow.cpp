@@ -203,9 +203,14 @@ void MainWindow::update_web_app(vector<TrackedPoint> &trackedPoints)
         if(n!=trackedPoints.size())
             json += ",";
     }
-    json += "]\n\ttimestamp:";
+    json += "],\n\t\"timestamp\":";
     if(trackedPoints.size())
-        json += to_simple_string(trackedPoints[0].getTimeStamp());
+        json += + "\"" + to_simple_string(trackedPoints[0].getTimeStamp()) + "\"";
+    else
+    {
+        Time timeStamp = Time(boost::posix_time::microsec_clock::local_time());;
+        json += + "\"" + to_simple_string(timeStamp) + "\"";
+    }
 
     json += "\n}";
     client_web_app->send(json.c_str(),json.length());
@@ -341,8 +346,8 @@ void MainWindow::doTracking()
     analysis( trackedPoints);
     update_globalTracks(trackedPoints);
 
-    if(trackedPoints.size())
-        update_web_app(trackedPoints);
+
+    update_web_app(trackedPoints);
 }
 
 void MainWindow::analysis(vector<TrackedPoint> &trackedPoints)

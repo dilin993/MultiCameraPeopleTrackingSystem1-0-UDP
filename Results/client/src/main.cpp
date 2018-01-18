@@ -100,6 +100,8 @@ int main(int argc, const char *argv[]) {
 
         vcap >> img;
 
+        imwrite("../original.jpeg",img);
+
         if (!img.data) {
             break;
         }
@@ -124,6 +126,7 @@ int main(int argc, const char *argv[]) {
             rectangle(img, detections[i].tl(), detections[i].br(), cv::Scalar(0, 255, 0), 2);
         }
         imshow(DISPLAY_MAIN, img);
+        imwrite("../detections.jpeg",img);
         if(!trainingMode)
         {
             waitKey(0);

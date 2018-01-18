@@ -15,47 +15,13 @@
 using namespace std;
 using namespace cv;
 
-data_t parameters[IMG_SIZE * MODELS * 3];
-
-
-uint8_t data_array[IMG_SIZE];
-uint8_t out_frame[IMG_SIZE] = { 0 };
-
-void init_params()
-{
-    for (int i = 0; i < IMG_SIZE; i = i + 1) {
-
-        parameters[i * MODELS * 3 + 0] = 0;
-        parameters[i * MODELS * 3 + 1] = 0;
-        //parameters[i * MODELS * 3 + 2] = 0;
-
-        parameters[i * MODELS * 3 + 2] = 4900;
-        parameters[i * MODELS * 3 + 3] = 4900;
-        //parameters[i * MODELS * 3 + 5] = 2500;
-
-        parameters[i * MODELS * 3 + 4] = 0.09;
-        parameters[i * MODELS * 3 + 5] = 0.09;
-        //parameters[i * MODELS * 3 + 8] = 0.07;
-
-    }
-}
-
-void execute(uint8_t *data_array, Mat &outImg, bool init) {
-
-    backsub(data_array, out_frame, init, parameters);
-//	backsub(data_array, out_frame, init);
-    for (int idxRows = 0; idxRows < IMG_H; idxRows++) {
-        for (int idxCols = 0; idxCols < IMG_W; idxCols = idxCols + 1) {
-            outImg.at<unsigned char>(idxRows, idxCols) = out_frame[idxRows
-                                                                    * IMG_W + idxCols];
-        }
-    }
-}
 
 
 BGSDetector *detector;
 ClientUDP *client;
 bool trainingMode = false;
+
+data_t bgmodel[4*BGM_SIZE];
 
 void signalHandler(int signum)
 {
@@ -85,7 +51,7 @@ int main(int argc, const char *argv[])
     string videoSource = "/dev/video0";
     string detectorSource;
     uint8_t cameraID = 0;
-    int WIDTH, HEIGHT, FPS, BGS_TH;
+    int width, height, FPS, BGS_TH;
 
 //    try
 //    {
@@ -98,8 +64,8 @@ int main(int argc, const char *argv[])
                 pugi::xml_node config = doc.child("configuration");
                 serverIP = config.child("server").attribute("ip").as_string();
                 videoSource = config.child("video").attribute("source").as_string();
-                WIDTH = config.child("video").attribute("width").as_int();
-                HEIGHT = config.child("video").attribute("height").as_int();
+                width = config.child("video").attribute("width").as_int();
+                height = config.child("video").attribute("height").as_int();
                 FPS = config.child("video").attribute("fps").as_int();
                 cameraID = (uint8_t) config.child("camera").attribute("id").as_int();
                 serverPort = (unsigned short) config.child("server").attribute("port").as_int();
@@ -107,8 +73,8 @@ int main(int argc, const char *argv[])
                 detectorSource = config.child("detector").attribute("source").as_string();
                 BGS_TH = config.child("detector").attribute("bgs_th").as_int();
                 detector = new BGSDetector(BGS_TH,
-                                           BGS_GMM,
-                                           false,
+                                           BGS_HW,
+                                           false, // gamma correction
                                            detectorSource,
                                            trainingMode);
             }
@@ -122,7 +88,7 @@ int main(int argc, const char *argv[])
 
 
         Mat img,gray;
-        Mat mask(IMG_H, IMG_W, CV_8UC1);
+        Mat mask(HEIGHT, WIDTH, CV_8UC1);
         bool init = true;
 
         VideoCapture vcap(videoSource);
@@ -132,10 +98,15 @@ int main(int argc, const char *argv[])
             return -1;
         }
 
-        vcap.set(CV_CAP_PROP_FRAME_WIDTH, WIDTH);
-        vcap.set(CV_CAP_PROP_FRAME_HEIGHT, HEIGHT);
+        vcap.set(CV_CAP_PROP_FRAME_WIDTH, width);
+        vcap.set(CV_CAP_PROP_FRAME_HEIGHT, height);
         vcap.set(CV_CAP_PROP_FPS, FPS);
         vcap.set(CV_CAP_PROP_AUTOFOCUS, 0);
+        vcap.set(CV_CAP_PROP_FOCUS,0);
+
+//        for (int w=0;w<120;w++){
+//            vcap.grab();
+//        }
 
         if (trainingMode)
             FPS = 1000;
@@ -147,12 +118,13 @@ int main(int argc, const char *argv[])
         int p, k;
         uint16_t frameNo = 0;
 
-        init_params();
-
         for (;;)
         {
 
             vcap >> img;
+
+            double focus = vcap.get(CV_CAP_PROP_FOCUS);
+            cout << "focus: " << focus << endl;
 
             if (!img.data)
             {
@@ -167,9 +139,8 @@ int main(int argc, const char *argv[])
             {
                 cvtColor(img, gray, CV_BGR2GRAY);
 
-                memcpy(data_array, gray.data, IMG_SIZE);
+                bgsub(gray.data,mask.data,init,bgmodel);
 
-                execute(data_array, mask, init);
 
                 if (init) init = false;
                 detections = detector->detect(mask);
@@ -200,7 +171,7 @@ int main(int argc, const char *argv[])
                     frame.histograms.push_back(histogram);
                 }
                 frameNo++;
-                frame.setMask(detector->mask);
+                //frame.setMask(detector->mask);
                 frame.set_now();
                 client->send(frame);
             }

@@ -88,9 +88,9 @@ std::vector<cv::Rect> BGSDetector::detect(cv::Mat &img)
     {
         Blob possibleBlob(convexHull);
 
-        float record[8] = {
-                (float)possibleBlob.currentBoundingRect.x,
-                (float)possibleBlob.currentBoundingRect.y,
+        float record[N_FEATURES] = {
+//                (float)possibleBlob.currentBoundingRect.x,
+//                (float)possibleBlob.currentBoundingRect.y,
                 (float)possibleBlob.currentBoundingRect.width,
                 (float)possibleBlob.currentBoundingRect.height,
                 (float)possibleBlob.currentBoundingRect.area(),
@@ -101,17 +101,14 @@ std::vector<cv::Rect> BGSDetector::detect(cv::Mat &img)
 
         if(trainingMode)
         {
-            if(method!=BGS_HW || (method==BGS_HW && count>=FRAME_WAIT))
-            {
-                DetectionRecord dr;
-                memcpy(dr.data,record,8* sizeof(float));
-                data.push_back(dr);
-                found.push_back(possibleBlob.currentBoundingRect);
-            }
+            DetectionRecord dr;
+            memcpy(dr.data, record, N_FEATURES * sizeof(float));
+            data.push_back(dr);
+            found.push_back(possibleBlob.currentBoundingRect);
         }
         else
         {
-            Mat x1(1,8,CV_32F,record);
+            Mat x1(1,N_FEATURES,CV_32F,record);
             Mat d = pca.project(x1);
             if(d.at<float>(0)>detectorTH)
                 found.push_back(possibleBlob.currentBoundingRect);
@@ -134,14 +131,6 @@ std::vector<cv::Rect> BGSDetector::detect(cv::Mat &img)
             histograms.push_back(histogram);
         }
 
-    }
-
-    if(method==BGS_HW && count<FRAME_WAIT+1)
-    {
-        count++;
-        cout << "Training GMM: " << count << endl;
-        if(count>=1800)
-            cout << "GMM fully trained!" << endl;
     }
 
     return detections;
@@ -186,7 +175,6 @@ BGSDetector::BGSDetector(double TH,
                                                           2,
                                                           0.7,
                                                           0);
-    count = 0;
     if(!trainingMode)
     {
         coeffFile.open(coeffFilePath,FileStorage::READ);
@@ -249,10 +237,10 @@ void BGSDetector::trainDetector()
 {
     if(!trainingMode)
         throw runtime_error("Training is only available in training mode.");
-    Mat dataMat((int)data.size(),8,CV_32F);
+    Mat dataMat((int)data.size(),N_FEATURES,CV_32F);
     for(int j=0;j<data.size();j++)
     {
-        for(int k=0;k<8;k++)
+        for(int k=0;k<N_FEATURES;k++)
         {
             dataMat.at<float>(j,k) = data[j].data[k];
         }

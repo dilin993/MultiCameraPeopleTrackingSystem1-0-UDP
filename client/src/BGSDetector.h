@@ -11,9 +11,11 @@
 #include "Detector.h"
 #include "Histogram.h"
 
-//#define BGS_DEBUG_MODE
+#define BGS_DEBUG_MODE
 
 #define FRAME_WAIT 300
+
+#define N_FEATURES 6
 
 class Blob
 {
@@ -72,7 +74,6 @@ private:
     double coeff[64];
     PCA pca;
     float detectorTH=0;
-    int count;
 
 };
 

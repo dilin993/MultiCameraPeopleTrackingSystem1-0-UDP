@@ -39,14 +39,18 @@ std::vector<cv::Rect> BGSDetector::detect(cv::Mat &img) {
     cv::imshow("BackSub",mask);
 #endif
 
+    imwrite("../bgsub.jpeg",mask);
 
     cv::Mat structuringElement = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3));
 
 
     cv::Mat maskPost;
     cv::dilate(mask, maskPost, structuringElement);
+    imwrite("../dilate1.jpeg",maskPost);
     cv::dilate(maskPost, maskPost, structuringElement);
+    imwrite("../dilate2.jpeg",maskPost);
     cv::erode(maskPost, maskPost, structuringElement);
+    imwrite("../errode.jpeg",maskPost);
 
 
     std::vector<std::vector<cv::Point> > contours;
@@ -64,6 +68,8 @@ std::vector<cv::Rect> BGSDetector::detect(cv::Mat &img) {
 #ifdef BGS_DEBUG_MODE
     cv::imshow("Shape",shape);
 #endif
+
+    imwrite("../shape.jpeg", shape);
 
     std::vector<std::vector<cv::Point> > convexHulls(contours.size());
 

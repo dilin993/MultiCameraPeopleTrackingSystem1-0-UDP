@@ -1,187 +1,224 @@
 #include "core.h"
 
-data_t vinit = 18000;
-data_t F[MODELS];	//Fitness
-data_t akt[MODELS];	//learning rate of mean and variance
+static const int defaultNMixtures = 5;
+static const int defaultHistory = 200;
+static const data_t defaultBackgroundRatio = 0.7;
+static const data_t defaultVarThreshold = 2.5*2.5;
+static const data_t defaultNoiseSigma = 30*0.5;
+static const data_t defaultInitialWeight = 0.05;
+const data_t w0 = defaultInitialWeight;
+const data_t sk0 = w0/(defaultNoiseSigma*2);
+const data_t var0 = defaultNoiseSigma*defaultNoiseSigma*4;
+const data_t minVar = defaultNoiseSigma*defaultNoiseSigma;
 
-data_t alpha_w = 0.004;
 
-uint8_t matchsum[76800][MODELS];
-bool back_gauss[76800][MODELS];
-data_t para[76800*MODELS*3];
+void process(uint8_t frame_in[IMG_SIZE/PARTS],
+             uint8_t frame_out[IMG_SIZE/PARTS],
+             data_t bgmodel[4*BGM_SIZE/PARTS],
+             const data_t learningRate)
+{
+    int x, y, k, k1, rows = HEIGHT/PARTS, cols = WIDTH;
+    data_t alpha = learningRate, T = defaultBackgroundRatio, vT = defaultVarThreshold;
+    data_t* mptr = bgmodel;
 
-int backsub(uint8_t frame_in[IMG_SIZE], uint8_t frame_out[76800], bool init, data_t para[76800*MODELS*3]){
 
-    static uint8_t data_array[IMG_SIZE/PARTS];
-    static uint8_t out_frame[IMG_SIZE/PARTS];
 
-    for (int x=0; x<PARTS;x++){
+    for( y = 0; y < rows; y++ )
+    {
+        const uint8_t * src = frame_in+y*cols;
+        uint8_t * dst = frame_out+y*cols;
 
-        memcpy(data_array, &frame_in[x*(IMG_SIZE/PARTS)], IMG_SIZE/PARTS);
+        if( alpha > 0 )
+        {
+            for( x = 0; x < cols; x++, mptr += K*4)
+            {
+                data_t wsum = 0;
+                data_t pix = src[x];
+                int kHit = -1, kForeground = -1;
 
-        if (init) {
-            for (int i = 0; i < IMG_SIZE/PARTS; i = i + 1) {
+                for( k = 0; k < K; k++ )
+                {
+                    data_t w = mptr[k*4+1];//weight;
+                    wsum += w;
+                    if( w < FLT_EPSILON )
+                        break;
+                    data_t mu = mptr[k*4+2];//.mean;
+                    data_t var = mptr[k*4+3];//.var;
+                    data_t diff = pix - mu;
+                    data_t d2 = diff*diff;
+                    if( d2 < vT*var )
+                    {
+                        wsum -= w;
+                        data_t dw = alpha*(1.f - w);
+                        mptr[k*4+1] = w + dw;
+                        mptr[k*4+2] = mu + alpha*diff;
+                        var = std::max(var + alpha*(d2 - var), minVar);
+                        mptr[k*4+3] = var;
+                        mptr[k*4] = w/std::sqrt(var);
 
-                matchsum[i+x*(IMG_SIZE/PARTS)][0] = 0;
-                matchsum[i+x*(IMG_SIZE/PARTS)][1] = 0;
+                        for( k1 = k-1; k1 >= 0; k1-- )
+                        {
+                            if( mptr[k1*4] >= mptr[k1*4+1] )
+                                break;
+                            std::swap( mptr[k1*4], mptr[k1*4+1] );
+                        }
 
-                back_gauss[i+x*(IMG_SIZE/PARTS)][0] = true;
-                back_gauss[i+x*(IMG_SIZE/PARTS)][1] = true;
+                        kHit = k1+1;
+                        break;
+                    }
+                }
 
-                para[x*(IMG_SIZE*MODELS*3/PARTS)+i * MODELS * 3 + 0] = 0;
-                para[x*(IMG_SIZE*MODELS*3/PARTS)+i * MODELS * 3 + 1] = 0;
-                //parameters[i * MODELS * 3 + 2] = 0;
+                if( kHit < 0 ) // no appropriate gaussian mixture found at all, remove the weakest mixture and create a new one
+                {
+                    kHit = k = std::min(k, (K-1));
+                    wsum += w0 - mptr[k*4+1];//.weight;
+                    mptr[k*4+1] = w0;
+                    mptr[k*4+2] = pix;
+                    mptr[k*4+3] = var0;
+                    mptr[k*4] = sk0;
+                }
+                else
+                {
+                    for( ; k < K; k++ )
+                    {
+                        wsum += mptr[k*4+1];//.weight;
+                    }
+                }
 
-                para[x*(IMG_SIZE*MODELS*3/PARTS)+i * MODELS * 3 + 2] = 4900;
-                para[x*(IMG_SIZE*MODELS*3/PARTS)+i * MODELS * 3 + 3] = 4900;
-                //parameters[i * MODELS * 3 + 5] = 2500;
 
-                para[x*(IMG_SIZE*MODELS*3/PARTS)+i * MODELS * 3 + 4] = 0.09;
-                para[x*(IMG_SIZE*MODELS*3/PARTS)+i * MODELS * 3 + 5] = 0.09;
+                data_t wscale = 1.f/wsum;
+                wsum = 0;
+                for( k = 0; k < K; k++ )
+                {
+                    wsum += mptr[k*4+1] *= wscale;
+                    mptr[k*4] *= wscale;
+                    if( wsum > T && kForeground < 0 )
+                        kForeground = k+1;
+                }
 
-                out_frame[i] = EM_ALGO(data_array[i], i, &para[x*(IMG_SIZE*MODELS*3/PARTS)], x);
-            }
-
-        } else {
-            for (int j=0; j<IMG_SIZE/PARTS; j++){
-                out_frame[j] = EM_ALGO(data_array[j], j, &para[x*(IMG_SIZE*MODELS*3/PARTS)], x);
+                dst[x] = (uint8_t)(-(kHit >= kForeground));
             }
         }
+        else
+        {
+            for( x = 0; x < cols; x++, mptr += K*4 )
+            {
+                data_t pix = src[x];
+                int kHit = -1, kForeground = -1;
 
+                for( k = 0; k < K; k++ )
+                {
+                    if( mptr[k*4+1] < FLT_EPSILON )
+                        break;
+                    data_t mu = mptr[k*4+2];
+                    data_t var = mptr[k*4+3];
+                    data_t diff = pix - mu;
+                    data_t d2 = diff*diff;
+                    if( d2 < vT*var )
+                    {
+                        kHit = k;
+                        break;
+                    }
+                }
 
-        memcpy(&frame_out[x*(IMG_SIZE/PARTS)], out_frame, IMG_SIZE/PARTS);
+                if( kHit >= 0 )
+                {
+                    data_t wsum = 0;
+                    for( k = 0; k < K; k++ )
+                    {
+                        wsum += mptr[k*4+1];
+                        if( wsum > T )
+                        {
+                            kForeground = k+1;
+                            break;
+                        }
+                    }
+                }
+
+                dst[x] = (uint8_t)(kHit < 0 || kHit >= kForeground ? 255 : 0);
+            }
+        }
     }
-    return 0;
 }
 
-uint8_t EM_ALGO(uint8_t pixel, int pos, data_t parameters[(IMG_SIZE/PARTS)*MODELS*3],int x) {
+void bgsub(uint8_t frame_in[IMG_SIZE],
+           uint8_t frame_out[IMG_SIZE],
+           bool init,
+           float bgmodel[4*BGM_SIZE])
+{
+    data_t part_bgmodel[4*BGM_SIZE/PARTS];
+    uint8_t part_frame_in[IMG_SIZE/PARTS];
+    uint8_t part_frame_out[IMG_SIZE/PARTS];
+    data_t learningRate;
 
-//#pragma HLS INLINE
+    data_t part2_bgmodel[4*BGM_SIZE/PARTS];
+    uint8_t part2_frame_in[IMG_SIZE/PARTS];
+    uint8_t part2_frame_out[IMG_SIZE/PARTS];
+    data_t learningRate2;
 
-    bool M[MODELS] = {false};
+    data_t part3_bgmodel[4*BGM_SIZE/PARTS];
+    uint8_t part3_frame_in[IMG_SIZE/PARTS];
+    uint8_t part3_frame_out[IMG_SIZE/PARTS];
+    data_t learningRate3;
 
-    //Checking whether the pixel is in 2.5sigma distance of every mean
-    for (int j = 0; j < MODELS; j++) {
-        if ((abs(pixel - parameters[pos* MODELS * 3 + j] ) < 2.5 * sqrtf(parameters[pos* MODELS * 3 + 2 + j] ))
-            and (back_gauss[x*(IMG_SIZE/PARTS)+pos][j])) {
-            M[j] = true;
-        }
-        akt[j] = alpha_w / parameters[pos*MODELS * 3 + 4 + j] ;
-        F[j] = parameters[pos*MODELS * 3 + 4 + j]  / parameters[pos*MODELS * 3+ 2 + j]  ;
+    data_t part4_bgmodel[4*BGM_SIZE/PARTS];
+    uint8_t part4_frame_in[IMG_SIZE/PARTS];
+    uint8_t part4_frame_out[IMG_SIZE/PARTS];
+    data_t learningRate4;
+
+    if( init )
+    {
+        for(int p=0;p<BGM_SIZE*4;p++)
+            bgmodel[p] = 0;
+
+        learningRate = 1;
+        learningRate2 = 1;
+        learningRate3 = 1;
+        learningRate4 = 1;
+    }
+    else
+    {
+        learningRate = ALPHA;
+        learningRate2 = ALPHA;
+        learningRate3 = ALPHA;
+        learningRate4 = ALPHA;
     }
 
-    /*The Gaussian that matches with the pixel (M=1) and has the highest F value is
-     considered as the “matched distribution�? and its parameters are updated */
-
-    data_t max_F = 0;
-    data_t min_F = 1000;
-    int max_val = 10;
-    int min_val = 10;
-    for (int j = 0; j < MODELS; j++) {
-        if (M[j]) {
-            if (F[j] > max_F) {
-                max_val = j;
-                max_F = F[j];
-            }
-        }
-        if (F[j] < min_F) {
-            min_val = j;
-            min_F = F[j];
-        }
+    for(int part=0;part<PARTS;part+=4)
+    {
+        read_mem:{
+        memcpy(part_frame_in,&frame_in[(IMG_SIZE/PARTS)*part],sizeof(uint8_t)*(IMG_SIZE/PARTS));
+        memcpy(part_bgmodel,&bgmodel[(4*BGM_SIZE/PARTS)*part],4*sizeof(data_t)*(BGM_SIZE/PARTS));
+        memcpy(part2_frame_in,&frame_in[(IMG_SIZE/PARTS)*(part+1)],sizeof(uint8_t)*(IMG_SIZE/PARTS));
+        memcpy(part2_bgmodel,&bgmodel[(4*BGM_SIZE/PARTS)*(part+1)],4*sizeof(data_t)*(BGM_SIZE/PARTS));
+        memcpy(part3_frame_in,&frame_in[(IMG_SIZE/PARTS)*(part+2)],sizeof(uint8_t)*(IMG_SIZE/PARTS));
+        memcpy(part3_bgmodel,&bgmodel[(4*BGM_SIZE/PARTS)*(part+2)],4*sizeof(data_t)*(BGM_SIZE/PARTS));
+        memcpy(part4_frame_in,&frame_in[(IMG_SIZE/PARTS)*(part+3)],sizeof(uint8_t)*(IMG_SIZE/PARTS));
+        memcpy(part4_bgmodel,&bgmodel[(4*BGM_SIZE/PARTS)*(part+3)],4*sizeof(data_t)*(BGM_SIZE/PARTS));
     }
 
-    if (max_val < MODELS) {	//For the largest F with M = 1
-        //updating mean
-        parameters[pos*MODELS * 3 + max_val] = parameters[pos*MODELS * 3 + max_val]
-                                               + akt[max_val] * (pixel - parameters[pos *MODELS * 3 + max_val]);
-
-        //updating sigma
-        parameters[pos * MODELS * 3 + 2 + max_val] = parameters[pos * MODELS * 3 + 2 + max_val]
-                                                     + akt[max_val]
-                                                       * ((pixel - parameters[pos * MODELS * 3 + max_val]) * (pixel - parameters[pos * MODELS * 3 + max_val])
-                                                          - parameters[pos* MODELS * 3 + 2 + max_val]);
-
-        //updating weight
-        parameters[pos* MODELS * 3 + 4 + max_val] = parameters[pos* MODELS * 3 + 4 + max_val]
-                                                    - alpha_w * parameters[pos* MODELS * 3 + 4 + max_val] + alpha_w;
-        //std::cout << 	"********"<<	weight[pos][max_val] << " " << pos<<std::endl;
-        matchsum[x*(IMG_SIZE/PARTS)+pos][max_val] = matchsum[x*(IMG_SIZE/PARTS)+pos][max_val] + 1;
-
-        for (int j = 0; j < 2; j++) {
-#pragma HLS UNROLL
-            //For the unmatched Gaussian distributions mean and variance are unchanged while the weights are updated
-
-            if (j != max_val) {
-                //updating weight
-                parameters[ MODELS * 3*pos + 4 + j] = parameters[ MODELS * 3*pos + 4 + j] - alpha_w;
-            }
-        }
-    } else { // no match procedure
-        parameters[pos* MODELS * 3 + min_val] = pixel; //mean
-        parameters[pos* MODELS * 3 + 2 + min_val] =vinit; // sigma
-        matchsum[x*(IMG_SIZE/PARTS)+pos][min_val] = 1;
-
-        data_t matchsumtot = 0;
-        for (int j = 0; j < MODELS; j++) {
-            //For the unmatched Gaussian distributions mean and variance are unchanged while the weights are updated
-            if (j != min_val) {
-                parameters[ MODELS * 3*pos + 4 + j] = parameters[ MODELS * 3*pos + 4 + j] - alpha_w;
-                matchsumtot = matchsumtot + matchsum[x*(IMG_SIZE/PARTS)+pos][j]; // matchsumtot is the sum of the values of the matchsum of the K-1 Gaussians with highest F
-            }
-        }
-        if (matchsumtot != 0) {
-            parameters[ MODELS * 3*pos + 4 + min_val] = 1 / matchsumtot;//updating weight
-        } else {
-            parameters[ MODELS * 3*pos + 4 + min_val] = 0.2; //updating weight
-        }
-        return 255; //not matched to any gaussian-> foreground
+        processing:{
+        process(part_frame_in,part_frame_out, part_bgmodel,learningRate);
+        process(part2_frame_in,part2_frame_out, part2_bgmodel,learningRate2);
+        process(part3_frame_in,part3_frame_out, part3_bgmodel,learningRate3);
+        process(part4_frame_in,part4_frame_out, part4_bgmodel,learningRate4);
     }
 
-    //creating a copy of weight and F to be sorted
-    data_t sorted_F[MODELS];
-    for (int i = 0; i < MODELS; i++) {
-        sorted_F[i] = F[i];
-    }
-    data_t sorted_weight[MODELS];
-    for (int i = 0; i < MODELS; i++) {
-        sorted_weight[i] = parameters[ MODELS * 3*pos + 4 + i]; //weight
-    }
 
-    int index[MODELS] = {0, 1};
-    data_t temp_F, temp_W;
-    int temp_index, j;
-    //Sorting W according to F - descending order
-    for (int i = 1; i < MODELS; i++) {
-        temp_F = sorted_F[i];
-        temp_W = sorted_weight[i];
-        temp_index = index[i];
-        j = i - 1;
-        while (temp_F > sorted_F[j] && j >= 0)
-            /*To sort elements in descending order, change temp<data[j] to temp>data[j] in above line.*/
-        {
-            sorted_F[j + 1] = sorted_F[j];
-            sorted_weight[j + 1] = sorted_weight[j];
-            index[j + 1] = index[j];
-            --j;
-        }
-        sorted_F[j + 1] = temp_F;
-        sorted_weight[j + 1] = temp_W;
-        index[j + 1] = temp_index;
+        write_mem:{
+        memcpy(&bgmodel[(4*BGM_SIZE/PARTS)*part],part_bgmodel,4*sizeof(data_t)*(BGM_SIZE/PARTS));
+        memcpy(&frame_out[(IMG_SIZE/PARTS)*part],part_frame_out,sizeof(uint8_t)*(IMG_SIZE/PARTS));
+        memcpy(&bgmodel[(4*BGM_SIZE/PARTS)*(part+1)],part2_bgmodel,4*sizeof(data_t)*(BGM_SIZE/PARTS));
+        memcpy(&frame_out[(IMG_SIZE/PARTS)*(part+1)],part2_frame_out,sizeof(uint8_t)*(IMG_SIZE/PARTS));
+        memcpy(&bgmodel[(4*BGM_SIZE/PARTS)*(part+2)],part3_bgmodel,4*sizeof(data_t)*(BGM_SIZE/PARTS));
+        memcpy(&frame_out[(IMG_SIZE/PARTS)*(part+2)],part3_frame_out,sizeof(uint8_t)*(IMG_SIZE/PARTS));
+        memcpy(&bgmodel[(4*BGM_SIZE/PARTS)*(part+3)],part4_bgmodel,4*sizeof(data_t)*(BGM_SIZE/PARTS));
+        memcpy(&frame_out[(IMG_SIZE/PARTS)*(part+3)],part4_frame_out,sizeof(uint8_t)*(IMG_SIZE/PARTS));
     }
 
-    back_gauss[x*(IMG_SIZE/PARTS)+pos][0]=false;
-    back_gauss[x*(IMG_SIZE/PARTS)+pos][1]=false;
 
-    data_t T = 0.7;
-    data_t B = 0;
 
-    for (int ind = 0; ind < MODELS; ind++) {
-        B = B + sorted_weight[ind];
-        back_gauss[x*(IMG_SIZE/PARTS)+pos][index[ind]]=true;
-        if (B >= T) {
-            break;
-        }
     }
 
-    return 0; //Background
+
 }

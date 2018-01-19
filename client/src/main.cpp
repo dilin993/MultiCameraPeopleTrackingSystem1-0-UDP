@@ -139,6 +139,8 @@ int main(int argc, const char *argv[])
             {
                 cvtColor(img, gray, CV_BGR2GRAY);
 
+                blur(gray,gray,Size(3,3));
+
                 bgsub(gray.data,mask.data,init,bgmodel);
 
 
@@ -171,7 +173,7 @@ int main(int argc, const char *argv[])
                     frame.histograms.push_back(histogram);
                 }
                 frameNo++;
-                //frame.setMask(detector->mask);
+                frame.setMask(detector->mask);
                 frame.set_now();
                 client->send(frame);
             }

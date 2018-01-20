@@ -263,7 +263,7 @@ void MainWindow::on_btnStartServer_clicked()
         serverThread = new ServerThread(frames,PORT);
         serverThread->start();
         ui->txtConsole->appendPlainText(tr("Server started...\n"));
-        timer->start(100); // Start time to handle frames
+        timer->start(120); // Start time to handle frames
     }
     else
     {
@@ -343,7 +343,7 @@ void MainWindow::doTracking()
 
     vector<TrackedPoint> trackedPoints = graph->getUniquePoints();
     updateScenes();
-    analysis( trackedPoints);
+    //analysis( trackedPoints);
     update_globalTracks(trackedPoints);
 
 
@@ -466,6 +466,8 @@ void MainWindow::update_globalTracks(vector<TrackedPoint> &trackedPoints)
                    MarkerTypes::MARKER_SQUARE, 7, 2);
 
     }
+
+    imwrite("global.jpeg",temp);
 
     QImage qImage((const uchar *) temp.data, temp.cols, temp.rows, temp.step, QImage::Format_RGB888);
     qImage.bits();

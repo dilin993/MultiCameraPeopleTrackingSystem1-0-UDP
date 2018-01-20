@@ -185,10 +185,12 @@ int main(int argc, const char *argv[])
                 rectangle(img, detections[i].tl(), detections[i].br(), cv::Scalar(0, 255, 0), 2);
             }
             imshow(DISPLAY_MAIN, img);
+            imwrite("cam2.jpeg",img);
             if (waitKey(1000 / FPS) > 0)
             {
                 break;
             }
+//            waitKey(0);
 
 #endif
 

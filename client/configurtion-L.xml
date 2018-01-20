@@ -3,9 +3,9 @@
 <configuration>
 
     <server ip="localhost" port="8080"/>
-    <video source="/home/dilin/Videos/Webcam/output4.avi" width="320" height="240" fps="30"/>
-    <camera id="0"/>
-    <detector source="../pca_coeff.xml" training="false" bgs_th="30"/>
+    <video source="/home/dilin/Videos/calib_testing/testing_R/test1-R.avi" width="320" height="240" fps="30"/>
+    <camera id="1"/>
+    <detector source="../pca_coeff-L.xml" training="false" bgs_th="30"/>
 
 
 </configuration>

@@ -343,10 +343,8 @@ void MainWindow::doTracking()
 
     vector<TrackedPoint> trackedPoints = graph->getUniquePoints();
     updateScenes();
-    //analysis( trackedPoints);
+    analysis( trackedPoints);
     update_globalTracks(trackedPoints);
-
-
     update_web_app(trackedPoints);
 }
 
@@ -360,15 +358,9 @@ void MainWindow::analysis(vector<TrackedPoint> &trackedPoints)
     // Add the time the x data buffer
     m_XData.append( timeValue );
 
-    // Generate random data with small variations
-    // This will generate a random intiger between [ 0 , 1 ]
-    qreal r = static_cast<qreal>( rand() ) / RAND_MAX  ;
-    // the next value will be 80 plus or minus 5
-    qreal value = 80 + 5 * r;
     m_YData.append( trackedPoints.size());
 
     // Keep the data buffers size under 100 value each,
-    // so our moemoty won't explode with random numbers
     if( m_XData.size() > 100 ){
         m_XData.remove( 0 );
         m_YData.remove( 0 );
@@ -376,8 +368,6 @@ void MainWindow::analysis(vector<TrackedPoint> &trackedPoints)
 
     // Add the data to the graph
     m_CustomPlot->graph( 0 )->setData( m_XData , m_YData );
-    // Now this is the tricky part, the previous part
-    // was easy and nothing new in it.
 
     // Set the range of the vertical and horizontal axis of the plot ( not the graph )
     // so all the data will be centered. first we get the min and max of the x and y data
@@ -431,25 +421,6 @@ void MainWindow::analysis(vector<TrackedPoint> &trackedPoints)
 
     // Update the plot widget
     m_CustomPlot->replot();
-
-//    series = new QLineSeries();
-//    int people_count = uniquePoints.size();
-
-
-
-//   // series->append(QTime::currentTime().toString(), people_count);
-//    series->append(2, 4);
-//    series->append(3, 8);
-//    series->append(7, 4);
-//    series->append(10, 5);
-//    //*series << QPointF(11, 1) << QPointF(13, 3) << QPointF(17, 6) << QPointF(18, 3) << QPointF(20, 2);
-
-//    //chart->add
-//    chart->legend()->hide();
-//    chart->addSeries(series);
-//    chart->createDefaultAxes();
-
-//    ui->textEdit->append(QTime::currentTime().toString());
 }
 
 void MainWindow::update_globalTracks(vector<TrackedPoint> &trackedPoints)

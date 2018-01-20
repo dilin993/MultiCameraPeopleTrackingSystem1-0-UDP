@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+
+<configuration>
+
+    <server ip="localhost" port="8080"/>
+
+    <video 
+        source="/home/dilin/Videos/people_videos/output-c1.avi"
+        width="320"
+        height="240"
+        fps="30"
+        wait="0"
+     />
+
+    <camera id="1"/>
+
+    <detector source="./pca_coeff-c1.xml" training="false" bgs_th="30"/>
+
+
+</configuration>

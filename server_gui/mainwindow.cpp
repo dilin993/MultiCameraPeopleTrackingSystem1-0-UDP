@@ -87,6 +87,27 @@ MainWindow::~MainWindow()
     delete ui;
     settings->sync();
     serverThread->exit();
+    delete settings;
+    delete timer;
+
+    for(int i=0;i<associations.size();i++)
+        delete associations[i];
+    for(int i=0;i<2;i++)
+        delete camScenes[i];
+    delete chartView;
+    delete series;
+    delete chart;
+    delete m_CustomPlot;
+    delete m_ValueIndex;
+    delete imageScene;
+    delete globalScene;
+    delete heatmapScene;
+    delete overlayScene;
+
+    delete client_web_app;
+
+    delete serverThread;
+
 }
 
 void MainWindow::on_btnBrowse_clicked()
@@ -298,14 +319,13 @@ void MainWindow::doTracking()
             // track bottom middle point
             detections.push_back(Point(bbox.x+bbox.width/2,bbox.y+bbox.height));
 
-            Mat normalizedHistogram(512,1,CV_32F),histogram(512,1,CV_16U);
+            Mat histogram(512,1,CV_32F);
             for(int i=0;i<512;i++)
             {
-                histogram.at<unsigned short>(i) = frame.histograms[k][i];
+                histogram.at<float>(i) = frame.histograms[k][i];
             }
-            histogram.convertTo(histogram,CV_32F);
-            normalize(histogram, normalizedHistogram, 1,0, cv::NORM_MINMAX);
-            histograms.push_back(normalizedHistogram);
+            normalize(histogram, histogram, 1,0, cv::NORM_MINMAX);
+            histograms.push_back(histogram);
             k++;
 
         }
@@ -335,7 +355,7 @@ void MainWindow::doTracking()
                                                      tracks[j].histogram,
                                                      pos,
                                                      tracks[j].color));
-            groundPlanePoints[i].setTimeStamp(associations[i]->getTimeStamp());
+            groundPlanePoints[j].setTimeStamp(associations[i]->getTimeStamp());
         }
         // do correspondence estimation
         graph->addNodes(groundPlanePoints);
@@ -346,6 +366,7 @@ void MainWindow::doTracking()
     analysis( trackedPoints);
     update_globalTracks(trackedPoints);
     update_web_app(trackedPoints);
+    update_heatmap(trackedPoints);
 }
 
 void MainWindow::analysis(vector<TrackedPoint> &trackedPoints)
@@ -450,13 +471,13 @@ void MainWindow::update_globalTracks(vector<TrackedPoint> &trackedPoints)
     ui->glob_track_view->update();
 }
 
-void MainWindow::update_heatmap(vector<Point2f> &trackedPoints){
+void MainWindow::update_heatmap(vector<TrackedPoint> &trackedPoints){
 
     //cv::Mat colourMap = cv::Mat::zeros(266,345,CV_8UC3);
 
     for(int k=0;k<trackedPoints.size();k++){
-        int x = trackedPoints[k].x;
-        int y = trackedPoints[k].y;
+        int x = trackedPoints[k].location.x;
+        int y = trackedPoints[k].location.y;
         //int val = pallete.at<cv::Vec3b>(0,0)[1];
 
         for (int i=0;i<266;i++){

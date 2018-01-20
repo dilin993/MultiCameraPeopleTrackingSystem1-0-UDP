@@ -49,7 +49,7 @@ private slots:
 
     //heatmap and global tracking
     void update_globalTracks(vector<TrackedPoint> &trackedPoints);
-    void update_heatmap(vector<Point2f> &trackedPoints);
+    void update_heatmap(vector<TrackedPoint> &trackedPoints);
     void analysis(vector<TrackedPoint> &trackedPoints);
 
 

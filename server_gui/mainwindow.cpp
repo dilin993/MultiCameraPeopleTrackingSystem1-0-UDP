@@ -452,8 +452,10 @@ void MainWindow::update_globalTracks(vector<TrackedPoint> &trackedPoints)
 
     for(int j=0;j<trackedPoints.size();j++)
     {
+        Point2f pos(trackedPoints[j].location.x,
+                    trackedPoints[j].location.y);
         drawMarker(temp,
-                   trackedPoints[j].location,
+                   pos,
                    trackedPoints[j].color,//colors[j],
                    MarkerTypes::MARKER_SQUARE, 7, 2);
 
